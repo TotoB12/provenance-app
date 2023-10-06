@@ -152,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           return SingleChildScrollView(
                             padding: const EdgeInsets.all(16.0),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
                                   '${snapshot.data?.productName ?? 'Unknown Product'}',
@@ -161,20 +161,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontFamily: 'Poly',
                                     fontWeight: FontWeight.w700,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                                 Card(
                                   child: ListTile(
-                                    leading: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.2, // 20% of screen width
-                                      child:
-                                          snapshot.data?.imageFrontUrl != null
-                                              ? Image.network(
-                                                  snapshot.data!.imageFrontUrl!,
-                                                  fit: BoxFit.scaleDown,
-                                                )
-                                              : const Icon(Icons.shopping_cart,
-                                                  size: 24.0),
+                                    leading: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.2, // 20% of screen width
+                                        child: snapshot.data?.imageFrontUrl !=
+                                                null
+                                            ? Image.network(
+                                                snapshot.data!.imageFrontUrl!,
+                                                fit: BoxFit.scaleDown,
+                                              )
+                                            : const Icon(Icons.shopping_cart,
+                                                size: 24.0),
+                                      ),
                                     ),
                                     title: Text(
                                       'Brands: ${snapshot.data?.brands ?? 'Unknown'}',
@@ -192,13 +197,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                     snapshot.data!.ecoscoreGrade != 'unknown')
                                   Card(
                                     child: ListTile(
-                                      leading: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4, // 40% of screen width
-                                        child: SvgPicture.asset(
-                                          'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
-                                          fit: BoxFit.scaleDown,
+                                      leading: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.4, // 40% of screen width
+                                          child: SvgPicture.asset(
+                                            'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
+                                            fit: BoxFit.scaleDown,
+                                          ),
                                         ),
                                       ),
                                       title: Text(
@@ -216,13 +225,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                         'not-applicable')
                                   Card(
                                     child: ListTile(
-                                      leading: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4,
-                                        child: SvgPicture.asset(
-                                          'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
-                                          fit: BoxFit.scaleDown,
+                                      leading: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.4,
+                                          child: SvgPicture.asset(
+                                            'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
+                                            fit: BoxFit.scaleDown,
+                                          ),
                                         ),
                                       ),
                                       title: Text(
@@ -240,13 +253,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                         'not-applicable')
                                   Card(
                                     child: ListTile(
-                                      leading: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4, // 40% of screen width
-                                        child: SvgPicture.asset(
-                                          'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
-                                          fit: BoxFit.scaleDown,
+                                      leading: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.4, // 40% of screen width
+                                          child: SvgPicture.asset(
+                                            'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
+                                            fit: BoxFit.scaleDown,
+                                          ),
                                         ),
                                       ),
                                       title: Text(
