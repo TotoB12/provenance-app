@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 1;
   bool isFlashOn = false;
   bool isCameraFlipped = false;
+  bool isWelcomeScreen = true;
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
@@ -69,7 +70,27 @@ class _MyHomePageState extends State<MyHomePage> {
       body: IndexedStack(
         index: _selectedIndex,
         children: <Widget>[
-          Container(color: Colors.white), // Search page
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.search,
+                  size: MediaQuery.of(context).size.height * 0.15,
+                  color: Colors.black,
+                ),
+                const Text(
+                  'Search for products\n above.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontFamily: 'Poly',
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ), // Search page
           Visibility(
             visible: _selectedIndex == 1,
             child: Column(
@@ -87,6 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               setState(() {
                                 this.barcode = barcode.rawValue ?? '';
                                 productFuture = getProductInfo(this.barcode);
+                                isWelcomeScreen = false;
                               });
                               HapticFeedback.heavyImpact();
                             }
@@ -117,6 +139,28 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     Positioned(
                       bottom: 10.0,
+                      left: MediaQuery.of(context).size.width / 2 -
+                          20, // Center the button
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.input),
+                          onPressed: () {
+                            setState(() {
+                              this.barcode = '8000500037560';
+                              productFuture = getProductInfo(this.barcode);
+                              isWelcomeScreen = false;
+                            });
+                            HapticFeedback.heavyImpact();
+                          },
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 10.0,
                       right: 10.0,
                       child: isCameraFlipped
                           ? Container()
@@ -140,153 +184,216 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
                 Expanded(
-                  child: FutureBuilder<Product>(
-                    future: productFuture,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<Product> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Text(errorMessage);
-                      } else {
-                        if (snapshot.hasData) {
-                          return SingleChildScrollView(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  '${snapshot.data?.productName ?? 'Unknown Product'}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontFamily: 'Poly',
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  textAlign: TextAlign.center,
+                  child: isWelcomeScreen
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              // ClipRRect(
+                              //   borderRadius: BorderRadius.circular(
+                              //       20), // Adjust as needed
+                              //   child: Image.asset(
+                              //     'assets/icons/icon.png',
+                              //     width: MediaQuery.of(context).size.width *
+                              //         0.5, // 50% of screen width
+                              //     height: MediaQuery.of(context).size.height *
+                              //         0.2, // 20% of screen height
+                              //     fit: BoxFit.cover,
+                              //   ),
+                              // ),
+                              Icon(
+                                Icons.camera_enhance,
+                                size: MediaQuery.of(context).size.height *
+                                    0.15, // 20% of screen height
+                                color: Colors.black, // Set the color as needed
+                              ),
+                              const Text(
+                                'Scan product to\n get started.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontFamily: 'Poly',
+                                  fontWeight: FontWeight.w700,
                                 ),
-                                Card(
-                                  child: ListTile(
-                                    leading: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.2, // 20% of screen width
-                                        child: snapshot.data?.imageFrontUrl !=
-                                                null
-                                            ? Image.network(
-                                                snapshot.data!.imageFrontUrl!,
-                                                fit: BoxFit.scaleDown,
-                                              )
-                                            : const Icon(Icons.shopping_cart,
-                                                size: 24.0),
+                              ),
+                            ],
+                          ),
+                        )
+                      : FutureBuilder<Product>(
+                          future: productFuture,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<Product> snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Text(errorMessage);
+                            } else {
+                              if (snapshot.hasData) {
+                                return SingleChildScrollView(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: Text(
+                                              '${snapshot.data?.productName ?? 'Unknown Product'}',
+                                              style: const TextStyle(
+                                                fontSize: 24,
+                                                fontFamily: 'Poly',
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.close),
+                                            onPressed: () {
+                                              setState(() {
+                                                isWelcomeScreen = true;
+                                              });
+                                            },
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    title: Text(
-                                      'Brands: ${snapshot.data?.brands ?? 'Unknown'}',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontFamily: 'Poly',
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                if (snapshot.data?.ecoscoreGrade != null &&
-                                    snapshot.data!.ecoscoreGrade !=
-                                        'not-applicable' &&
-                                    snapshot.data!.ecoscoreGrade != 'unknown')
-                                  Card(
-                                    child: ListTile(
-                                      leading: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.4, // 40% of screen width
-                                          child: SvgPicture.asset(
-                                            'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
-                                            fit: BoxFit.scaleDown,
+                                      Card(
+                                        child: ListTile(
+                                          leading: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2, // 20% of screen width
+                                              child: snapshot.data
+                                                          ?.imageFrontUrl !=
+                                                      null
+                                                  ? Image.network(
+                                                      snapshot
+                                                          .data!.imageFrontUrl!,
+                                                      fit: BoxFit.scaleDown,
+                                                    )
+                                                  : const Icon(
+                                                      Icons.shopping_cart,
+                                                      size: 24.0),
+                                            ),
+                                          ),
+                                          title: Text(
+                                            'Brands: ${snapshot.data?.brands ?? 'Unknown'}',
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontFamily: 'Poly',
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      title: Text(
-                                        'EcoScore: ${snapshot.data?.ecoscoreGrade ?? 'Unknown'}',
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontFamily: 'Poly',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                if (snapshot.data?.nutriscore != null &&
-                                    snapshot.data!.nutriscore !=
-                                        'not-applicable')
-                                  Card(
-                                    child: ListTile(
-                                      leading: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.4,
-                                          child: SvgPicture.asset(
-                                            'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
-                                            fit: BoxFit.scaleDown,
+                                      if (snapshot.data?.ecoscoreGrade !=
+                                              null &&
+                                          snapshot.data!.ecoscoreGrade !=
+                                              'not-applicable' &&
+                                          snapshot.data!.ecoscoreGrade !=
+                                              'unknown')
+                                        Card(
+                                          child: ListTile(
+                                            leading: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.4, // 40% of screen width
+                                                child: SvgPicture.asset(
+                                                  'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
+                                                  fit: BoxFit.scaleDown,
+                                                ),
+                                              ),
+                                            ),
+                                            title: Text(
+                                              'EcoScore: ${snapshot.data?.ecoscoreGrade ?? 'Unknown'}',
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontFamily: 'Poly',
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      title: Text(
-                                        'NutriScore: ${snapshot.data?.nutriscore ?? 'Unknown'}',
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontFamily: 'Poly',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                if (snapshot.data?.novaGroup != null &&
-                                    snapshot.data!.novaGroup !=
-                                        'not-applicable')
-                                  Card(
-                                    child: ListTile(
-                                      leading: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.4, // 40% of screen width
-                                          child: SvgPicture.asset(
-                                            'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
-                                            fit: BoxFit.scaleDown,
+                                      if (snapshot.data?.nutriscore != null &&
+                                          snapshot.data!.nutriscore !=
+                                              'not-applicable')
+                                        Card(
+                                          child: ListTile(
+                                            leading: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.4,
+                                                child: SvgPicture.asset(
+                                                  'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
+                                                  fit: BoxFit.scaleDown,
+                                                ),
+                                              ),
+                                            ),
+                                            title: Text(
+                                              'NutriScore: ${snapshot.data?.nutriscore ?? 'Unknown'}',
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontFamily: 'Poly',
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      title: Text(
-                                        'Nova Group: ${snapshot.data?.novaGroup ?? 'Unknown'}',
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontFamily: 'Poly',
-                                          fontWeight: FontWeight.w500,
+                                      if (snapshot.data?.novaGroup != null &&
+                                          snapshot.data!.novaGroup !=
+                                              'not-applicable')
+                                        Card(
+                                          child: ListTile(
+                                            leading: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.4, // 40% of screen width
+                                                child: SvgPicture.asset(
+                                                  'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
+                                                  fit: BoxFit.scaleDown,
+                                                ),
+                                              ),
+                                            ),
+                                            title: Text(
+                                              'Nova Group: ${snapshot.data?.novaGroup ?? 'Unknown'}',
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontFamily: 'Poly',
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
+                                      // Add more fields as needed
+                                    ],
                                   ),
-                                // Add more fields as needed
-                              ],
-                            ),
-                          );
-                        } else {
-                          return Text(errorMessage);
-                        }
-                      }
-                    },
-                  ),
+                                );
+                              } else {
+                                return Text(errorMessage);
+                              }
+                            }
+                          },
+                        ),
                 ),
               ],
             ),
