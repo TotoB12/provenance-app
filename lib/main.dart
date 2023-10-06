@@ -154,6 +154,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                Text(
+                                  '${snapshot.data?.productName ?? 'Unknown Product'}',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontFamily: 'Poly',
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                                 Card(
                                   child: ListTile(
                                     leading: Container(
@@ -163,20 +171,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                           snapshot.data?.imageFrontUrl != null
                                               ? Image.network(
                                                   snapshot.data!.imageFrontUrl!,
-                                                  fit: BoxFit.cover,
+                                                  fit: BoxFit.scaleDown,
                                                 )
                                               : const Icon(Icons.shopping_cart,
                                                   size: 24.0),
                                     ),
                                     title: Text(
-                                      '${snapshot.data?.productName ?? 'Unknown Product'}',
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontFamily: 'Poly',
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    subtitle: Text(
                                       'Brands: ${snapshot.data?.brands ?? 'Unknown'}',
                                       style: const TextStyle(
                                         fontSize: 20,
@@ -198,11 +198,35 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 0.4, // 40% of screen width
                                         child: SvgPicture.asset(
                                           'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
-                                          fit: BoxFit.cover,
+                                          fit: BoxFit.scaleDown,
                                         ),
                                       ),
                                       title: Text(
                                         'EcoScore: ${snapshot.data?.ecoscoreGrade ?? 'Unknown'}',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontFamily: 'Poly',
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                if (snapshot.data?.nutriscore != null &&
+                                    snapshot.data!.nutriscore !=
+                                        'not-applicable')
+                                  Card(
+                                    child: ListTile(
+                                      leading: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.4,
+                                        child: SvgPicture.asset(
+                                          'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
+                                          fit: BoxFit.scaleDown,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        'NutriScore: ${snapshot.data?.nutriscore ?? 'Unknown'}',
                                         style: const TextStyle(
                                           fontSize: 20,
                                           fontFamily: 'Poly',
@@ -222,35 +246,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 0.4, // 40% of screen width
                                         child: SvgPicture.asset(
                                           'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
-                                          fit: BoxFit.cover,
+                                          fit: BoxFit.scaleDown,
                                         ),
                                       ),
                                       title: Text(
                                         'Nova Group: ${snapshot.data?.novaGroup ?? 'Unknown'}',
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontFamily: 'Poly',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                if (snapshot.data?.nutriscore != null &&
-                                    snapshot.data!.nutriscore !=
-                                        'not-applicable')
-                                  Card(
-                                    child: ListTile(
-                                      leading: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4, // 40% of screen width
-                                        child: SvgPicture.asset(
-                                          'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        'NutriScore: ${snapshot.data?.nutriscore ?? 'Unknown'}',
                                         style: const TextStyle(
                                           fontSize: 20,
                                           fontFamily: 'Poly',
