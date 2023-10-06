@@ -49,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
     formats: [BarcodeFormat.ean13, BarcodeFormat.upcA],
+    detectionSpeed: DetectionSpeed.noDuplicates,
   );
 
   @override
