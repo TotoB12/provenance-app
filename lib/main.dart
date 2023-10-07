@@ -53,7 +53,56 @@ class _MyHomePageState extends State<MyHomePage> {
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
 
-// PageController _pageController = PageController();
+  // PageController _pageController = PageController();
+
+  String getEcoScoreMessage(String grade) {
+    switch (grade.toUpperCase()) {
+      case 'A':
+        return 'Very good';
+      case 'B':
+        return 'Good';
+      case 'C':
+        return 'Mediocre';
+      case 'D':
+        return 'Bad';
+      case 'E':
+        return 'Very bad';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  String getNutriScoreMessage(String grade) {
+    switch (grade.toUpperCase()) {
+      case 'A':
+        return 'Very good';
+      case 'B':
+        return 'Good';
+      case 'C':
+        return 'Mediocre';
+      case 'D':
+        return 'Bad';
+      case 'E':
+        return 'Very bad';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  String getNovaGroupMessage(String group) {
+    switch (group) {
+      case '1':
+        return 'Unprocessed or minimally processed foods';
+      case '2':
+        return 'Processed culinary ingredients';
+      case '3':
+        return 'Processed foods';
+      case '4':
+        return 'Ultra-processed food and drink products';
+      default:
+        return 'Unknown';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -273,7 +322,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  0.2, // 20% of screen width
+                                                  0.2,
                                               child: snapshot.data
                                                           ?.imageFrontUrl !=
                                                       null
@@ -288,7 +337,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ),
                                           ),
                                           title: Text(
-                                            'Brands: ${snapshot.data?.brands ?? 'Unknown'}',
+                                            '${snapshot.data?.brands ?? 'Unknown'}, ${snapshot.data?.quantity ?? 'Unknown quantity'}',
                                             style: const TextStyle(
                                               fontSize: 20,
                                               fontFamily: 'Poly',
@@ -312,7 +361,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.4, // 40% of screen width
+                                                    0.4,
                                                 child: SvgPicture.asset(
                                                   'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
                                                   fit: BoxFit.scaleDown,
@@ -320,7 +369,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ),
                                             ),
                                             title: Text(
-                                              'EcoScore: ${snapshot.data?.ecoscoreGrade ?? 'Unknown'}',
+                                              'EcoScore: ${getEcoScoreMessage(snapshot.data?.ecoscoreGrade ?? 'Unknown')}',
                                               style: const TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'Poly',
@@ -349,7 +398,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ),
                                             ),
                                             title: Text(
-                                              'NutriScore: ${snapshot.data?.nutriscore ?? 'Unknown'}',
+                                              'NutriScore: ${getNutriScoreMessage(snapshot.data?.nutriscore ?? 'Unknown')}',
                                               style: const TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'Poly',
@@ -370,7 +419,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.4, // 40% of screen width
+                                                    0.4,
                                                 child: SvgPicture.asset(
                                                   'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
                                                   fit: BoxFit.scaleDown,
@@ -378,7 +427,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ),
                                             ),
                                             title: Text(
-                                              'Nova Group: ${snapshot.data?.novaGroup ?? 'Unknown'}',
+                                              'Nova Group: ${getNovaGroupMessage(snapshot.data?.novaGroup.toString() ?? 'Unknown')}',
                                               style: const TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'Poly',
@@ -387,7 +436,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ),
                                           ),
                                         ),
-                                      // Add more fields as needed
                                     ],
                                   ),
                                 );
