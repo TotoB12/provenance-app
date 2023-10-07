@@ -53,6 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
 
+// PageController _pageController = PageController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -249,6 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 fontFamily: 'Poly',
                                                 fontWeight: FontWeight.w700,
                                               ),
+                                              maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
@@ -437,6 +440,11 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
               selectedIndex: _selectedIndex,
               onTabChange: (index) {
+                // _pageController.animateToPage(
+                //   index,
+                //   duration: const Duration(milliseconds: 400),
+                //   curve: Curves.easeInOut,
+                // );
                 if (_selectedIndex == 1) {
                   cameraController.dispose();
                 }
