@@ -92,13 +92,13 @@ class _MyHomePageState extends State<MyHomePage> {
   String getNovaGroupMessage(String group) {
     switch (group) {
       case '1':
-        return 'Unprocessed or minimally processed foods';
+        return 'Unprocessed or minimally processed food';
       case '2':
         return 'Processed culinary ingredients';
       case '3':
         return 'Processed foods';
       case '4':
-        return 'Ultra-processed food and drink products';
+        return 'Ultra-processed product';
       default:
         return 'Unknown';
     }
@@ -324,7 +324,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       .width *
                                                   0.2,
                                               child: snapshot.data
-                                                          ?.imageFrontUrl !=
+                                                          ?.imageFrontSmallUrl !=
                                                       null
                                                   ? Image.network(
                                                       snapshot
@@ -346,6 +346,66 @@ class _MyHomePageState extends State<MyHomePage> {
                                           ),
                                         ),
                                       ),
+                                      if (snapshot.data?.nutriscore != null &&
+                                          snapshot.data!.nutriscore !=
+                                              'not-applicable')
+                                        Card(
+                                          child: ListTile(
+                                            leading: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.2,
+                                                child: SvgPicture.asset(
+                                                  'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
+                                                  fit: BoxFit.scaleDown,
+                                                ),
+                                              ),
+                                            ),
+                                            title: Text(
+                                              '${getNutriScoreMessage(snapshot.data?.nutriscore ?? 'Unknown')}',
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontFamily: 'Poly',
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      if (snapshot.data?.ingredientsText
+                                              ?.isNotEmpty ??
+                                          false)
+                                        Card(
+                                          child: ExpansionTile(
+                                            title: Text(
+                                              'Ingredients: ${snapshot.data?.ingredientsText?.substring(0, 50)}...', // Show a preview of the ingredients
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontFamily: 'Poly',
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  '${snapshot.data?.ingredientsText}', // Show all the ingredients
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontFamily: 'Poly',
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       if (snapshot.data?.ecoscoreGrade !=
                                               null &&
                                           snapshot.data!.ecoscoreGrade !=
@@ -361,7 +421,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.4,
+                                                    0.2,
                                                 child: SvgPicture.asset(
                                                   'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
                                                   fit: BoxFit.scaleDown,
@@ -369,36 +429,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ),
                                             ),
                                             title: Text(
-                                              'EcoScore: ${getEcoScoreMessage(snapshot.data?.ecoscoreGrade ?? 'Unknown')}',
-                                              style: const TextStyle(
-                                                fontSize: 20,
-                                                fontFamily: 'Poly',
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      if (snapshot.data?.nutriscore != null &&
-                                          snapshot.data!.nutriscore !=
-                                              'not-applicable')
-                                        Card(
-                                          child: ListTile(
-                                            leading: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.4,
-                                                child: SvgPicture.asset(
-                                                  'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
-                                                  fit: BoxFit.scaleDown,
-                                                ),
-                                              ),
-                                            ),
-                                            title: Text(
-                                              'NutriScore: ${getNutriScoreMessage(snapshot.data?.nutriscore ?? 'Unknown')}',
+                                              '${getEcoScoreMessage(snapshot.data?.ecoscoreGrade ?? 'Unknown')}',
                                               style: const TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'Poly',
@@ -419,7 +450,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.4,
+                                                    0.1,
                                                 child: SvgPicture.asset(
                                                   'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
                                                   fit: BoxFit.scaleDown,
@@ -427,7 +458,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ),
                                             ),
                                             title: Text(
-                                              'Nova Group: ${getNovaGroupMessage(snapshot.data?.novaGroup.toString() ?? 'Unknown')}',
+                                              '${getNovaGroupMessage(snapshot.data?.novaGroup.toString() ?? 'Unknown')}',
                                               style: const TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'Poly',
