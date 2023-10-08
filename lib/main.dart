@@ -4,6 +4,7 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:expandable_text/expandable_text.dart';
 
 void main() {
   OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Provenance');
@@ -379,31 +380,28 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ?.isNotEmpty ??
                                           false)
                                         Card(
-                                          child: ExpansionTile(
+                                          child: ListTile(
                                             title: Text(
-                                              'Ingredients: ${snapshot.data?.ingredientsText?.substring(0, 50)}...', // Show a preview of the ingredients
+                                              'Ingredients',
                                               style: const TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'Poly',
                                                 fontWeight: FontWeight.w500,
                                               ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Text(
-                                                  '${snapshot.data?.ingredientsText}', // Show all the ingredients
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontFamily: 'Poly',
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
+                                            subtitle: ExpandableText(
+                                              snapshot.data?.ingredientsText ??
+                                                  '',
+                                              expandText: 'show more',
+                                              collapseText: 'show less',
+                                              maxLines: 1,
+                                              linkColor: Colors.blue,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'Poly',
+                                                fontWeight: FontWeight.w400,
                                               ),
-                                            ],
+                                            ),
                                           ),
                                         ),
                                       if (snapshot.data?.ecoscoreGrade !=
