@@ -504,51 +504,70 @@ class _MyHomePageState extends State<MyHomePage> {
                     itemBuilder: (context, index) {
                       Product product = products[index];
                       return Card(
-                        child: Column(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            ListTile(
-                              leading: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.2,
-                                  child: product.imageFrontSmallUrl != null
-                                      ? Image.network(product.imageFrontUrl!,
-                                          fit: BoxFit.scaleDown)
-                                      : const Icon(Icons.shopping_cart,
-                                          size: 24.0),
-                                ),
-                              ),
-                              title: Text(
-                                '${product.productName ?? 'Unknown Product'}',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontFamily: 'Poly',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                child: product.imageFrontSmallUrl != null
+                                    ? Image.network(product.imageFrontUrl!,
+                                        fit: BoxFit.scaleDown)
+                                    : const Icon(Icons.shopping_cart,
+                                        size: 24.0),
                               ),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Row(
-                                children: [
-                                  if (product.nutriscore != null &&
-                                      product.nutriscore != 'not-applicable')
-                                    SvgPicture.asset(
-                                        'assets/images/nutriscore-${product.nutriscore}.svg'),
-                                  if (product.ecoscoreGrade != null &&
-                                      product.ecoscoreGrade !=
-                                          'not-applicable' &&
-                                      product.ecoscoreGrade != 'unknown')
-                                    SvgPicture.asset(
-                                        'assets/images/ecoscore-${product.ecoscoreGrade}.svg'),
-                                  if (product.novaGroup != null &&
-                                      product.novaGroup != 'not-applicable')
-                                    SvgPicture.asset(
-                                        'assets/images/nova-group-${product.novaGroup}.svg'),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  ListTile(
+                                    title: Text(
+                                      '${product.productName ?? 'Unknown Product'}',
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontFamily: 'Poly',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        if (product.nutriscore != null &&
+                                            product.nutriscore !=
+                                                'not-applicable')
+                                          Expanded(
+                                              child: SvgPicture.asset(
+                                                  'assets/images/nutriscore-${product.nutriscore}.svg',
+                                                  height: 50)),
+                                        SizedBox(width: 10),
+                                        if (product.ecoscoreGrade != null &&
+                                            product.ecoscoreGrade !=
+                                                'not-applicable' &&
+                                            product.ecoscoreGrade != 'unknown')
+                                          Expanded(
+                                              child: SvgPicture.asset(
+                                                  'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
+                                                  height: 50)),
+                                        SizedBox(width: 10),
+                                        if (product.novaGroup != null &&
+                                            product.novaGroup !=
+                                                'not-applicable')
+                                          Expanded(
+                                              child: SvgPicture.asset(
+                                                  'assets/images/nova-group-${product.novaGroup}.svg',
+                                                  height: 50)),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
