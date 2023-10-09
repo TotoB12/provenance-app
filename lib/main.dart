@@ -4,6 +4,8 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 void main() {
   OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Provenance');
@@ -381,7 +383,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         Card(
                                           child: ExpansionTile(
                                             title: Text(
-                                              '${(snapshot.data!.ingredientsText ?? '').split(',').length ?? 'Unknown'} ingredient${(snapshot.data!.ingredientsText ?? '').split(',').length > 1 ? 's' : ''}',
+                                              '${(snapshot.data!.ingredientsText ?? '').split(',').length} ingredient${(snapshot.data!.ingredientsText ?? '').split(',').length > 1 ? 's' : ''}',
                                               style: const TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'Poly',
@@ -400,7 +402,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 padding:
                                                     const EdgeInsets.all(8.0),
                                                 child: Text(
-                                                  '${snapshot.data?.ingredientsText}', // Show all the ingredients
+                                                  '${snapshot.data?.ingredientsText}',
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                     fontFamily: 'Poly',
@@ -485,7 +487,80 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ), // Scan page
-          Container(color: Colors.white), // History page
+          Container(
+            color: Colors.white,
+            child: FutureBuilder<List<String>>(
+              future: SharedPreferences.getInstance()
+                  .then((prefs) => prefs.getStringList('history') ?? []),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  List<Product> products = snapshot.data!
+                      .map((e) => Product.fromJson(jsonDecode(e)))
+                      .toList();
+                  return ListView.builder(
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      Product product = products[index];
+                      return Card(
+                        child: Column(
+                          children: <Widget>[
+                            ListTile(
+                              leading: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.2,
+                                  child: product.imageFrontSmallUrl != null
+                                      ? Image.network(product.imageFrontUrl!,
+                                          fit: BoxFit.scaleDown)
+                                      : const Icon(Icons.shopping_cart,
+                                          size: 24.0),
+                                ),
+                              ),
+                              title: Text(
+                                '${product.productName ?? 'Unknown Product'}',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontFamily: 'Poly',
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Row(
+                                children: [
+                                  if (product.nutriscore != null &&
+                                      product.nutriscore != 'not-applicable')
+                                    SvgPicture.asset(
+                                        'assets/images/nutriscore-${product.nutriscore}.svg'),
+                                  if (product.ecoscoreGrade != null &&
+                                      product.ecoscoreGrade !=
+                                          'not-applicable' &&
+                                      product.ecoscoreGrade != 'unknown')
+                                    SvgPicture.asset(
+                                        'assets/images/ecoscore-${product.ecoscoreGrade}.svg'),
+                                  if (product.novaGroup != null &&
+                                      product.novaGroup != 'not-applicable')
+                                    SvgPicture.asset(
+                                        'assets/images/nova-group-${product.novaGroup}.svg'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ), // History page
         ],
       ),
       bottomNavigationBar: Container(
@@ -561,6 +636,12 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       ProductResultV3 result = await OpenFoodAPIClient.getProductV3(config);
       if (result.product != null) {
+        // Save the product data
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        List<String> history = prefs.getStringList('history') ?? [];
+        history.add(jsonEncode(result.product!.toJson()));
+        await prefs.setStringList('history', history);
+
         return result.product!;
       } else {
         throw Exception('Product not found');
