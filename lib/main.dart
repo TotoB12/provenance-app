@@ -48,6 +48,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isFlashOn = false;
   bool isCameraFlipped = false;
   bool isWelcomeScreen = true;
+  int historyVersion = 0;
+  bool isError = false;
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
@@ -160,6 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             if (barcode.rawValue != this.barcode) {
                               setState(() {
                                 this.barcode = barcode.rawValue ?? '';
+                                isError = false; // Reset the error flag
                                 productFuture = getProductInfo(this.barcode);
                                 isWelcomeScreen = false;
                               });
@@ -237,31 +240,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
                 Expanded(
-                  child: isWelcomeScreen
+                  child: isError
                       ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              // ClipRRect(
-                              //   borderRadius: BorderRadius.circular(
-                              //       20), // Adjust as needed
-                              //   child: Image.asset(
-                              //     'assets/icons/icon.png',
-                              //     width: MediaQuery.of(context).size.width *
-                              //         0.5, // 50% of screen width
-                              //     height: MediaQuery.of(context).size.height *
-                              //         0.2, // 20% of screen height
-                              //     fit: BoxFit.cover,
-                              //   ),
-                              // ),
                               Icon(
-                                Icons.camera_enhance,
-                                size: MediaQuery.of(context).size.height *
-                                    0.15, // 20% of screen height
-                                color: Colors.black, // Set the color as needed
+                                Icons.network_check,
+                                size: MediaQuery.of(context).size.height * 0.15,
+                                color: Colors.red,
                               ),
-                              const Text(
-                                'Scan product to\n get started.',
+                              Text(
+                                'There has been an error,\nplease try again.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 22,
@@ -272,85 +262,84 @@ class _MyHomePageState extends State<MyHomePage> {
                             ],
                           ),
                         )
-                      : FutureBuilder<Product>(
-                          future: productFuture,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<Product> snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Text(errorMessage);
-                            } else {
-                              if (snapshot.hasData) {
-                                return SingleChildScrollView(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Text(
-                                              '${snapshot.data?.productName ?? 'Unknown Product'}',
-                                              style: const TextStyle(
-                                                fontSize: 24,
-                                                fontFamily: 'Poly',
-                                                fontWeight: FontWeight.w700,
+                      : isWelcomeScreen
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  // ClipRRect(
+                                  //   borderRadius: BorderRadius.circular(
+                                  //       20), // Adjust as needed
+                                  //   child: Image.asset(
+                                  //     'assets/icons/icon.png',
+                                  //     width: MediaQuery.of(context).size.width *
+                                  //         0.5, // 50% of screen width
+                                  //     height: MediaQuery.of(context).size.height *
+                                  //         0.2, // 20% of screen height
+                                  //     fit: BoxFit.cover,
+                                  //   ),
+                                  // ),
+                                  Icon(
+                                    Icons.camera_enhance,
+                                    size: MediaQuery.of(context).size.height *
+                                        0.15, // 20% of screen height
+                                    color:
+                                        Colors.black, // Set the color as needed
+                                  ),
+                                  const Text(
+                                    'Scan product to\n get started.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontFamily: 'Poly',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : FutureBuilder<Product>(
+                              future: productFuture,
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<Product> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                } else {
+                                  // if (snapshot.hasData) {
+                                  return SingleChildScrollView(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Text(
+                                                '${snapshot.data?.productName ?? 'Unknown Product'}',
+                                                style: const TextStyle(
+                                                  fontSize: 24,
+                                                  fontFamily: 'Poly',
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.close),
-                                            onPressed: () {
-                                              setState(() {
-                                                isWelcomeScreen = true;
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      Card(
-                                        child: ListTile(
-                                          leading: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.2,
-                                              child: snapshot.data
-                                                          ?.imageFrontSmallUrl !=
-                                                      null
-                                                  ? Image.network(
-                                                      snapshot
-                                                          .data!.imageFrontUrl!,
-                                                      fit: BoxFit.scaleDown,
-                                                    )
-                                                  : const Icon(
-                                                      Icons.shopping_cart,
-                                                      size: 24.0),
+                                            IconButton(
+                                              icon: const Icon(Icons.close),
+                                              onPressed: () {
+                                                setState(() {
+                                                  isWelcomeScreen = true;
+                                                });
+                                              },
                                             ),
-                                          ),
-                                          title: Text(
-                                            '${snapshot.data?.brands ?? 'Unknown'}, ${snapshot.data?.quantity ?? 'Unknown quantity'}',
-                                            style: const TextStyle(
-                                              fontSize: 20,
-                                              fontFamily: 'Poly',
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
+                                          ],
                                         ),
-                                      ),
-                                      if (snapshot.data?.nutriscore != null &&
-                                          snapshot.data!.nutriscore !=
-                                              'not-applicable')
                                         Card(
                                           child: ListTile(
                                             leading: Padding(
@@ -361,14 +350,21 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         .size
                                                         .width *
                                                     0.2,
-                                                child: SvgPicture.asset(
-                                                  'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
-                                                  fit: BoxFit.scaleDown,
-                                                ),
+                                                child: snapshot.data
+                                                            ?.imageFrontSmallUrl !=
+                                                        null
+                                                    ? Image.network(
+                                                        snapshot.data!
+                                                            .imageFrontUrl!,
+                                                        fit: BoxFit.scaleDown,
+                                                      )
+                                                    : const Icon(
+                                                        Icons.shopping_cart,
+                                                        size: 24.0),
                                               ),
                                             ),
                                             title: Text(
-                                              '${getNutriScoreMessage(snapshot.data?.nutriscore ?? 'Unknown')}',
+                                              '${snapshot.data?.brands ?? 'Unknown'}, ${snapshot.data?.quantity ?? 'Unknown quantity'}',
                                               style: const TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'Poly',
@@ -377,112 +373,142 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ),
                                           ),
                                         ),
-                                      if (snapshot.data?.ingredientsText
-                                              ?.isNotEmpty ??
-                                          false)
-                                        Card(
-                                          child: ExpansionTile(
-                                            title: Text(
-                                              '${(snapshot.data!.ingredientsText ?? '').split(',').length} ingredient${(snapshot.data!.ingredientsText ?? '').split(',').length > 1 ? 's' : ''}',
-                                              style: const TextStyle(
-                                                fontSize: 20,
-                                                fontFamily: 'Poly',
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            leading: const Icon(Icons.list),
-                                            collapsedTextColor: Colors
-                                                .black, // Color of the title text when the tile is collapsed
-                                            textColor: Colors
-                                                .blue, // Color of the title text when the tile is expanded
-                                            children: [
-                                              Padding(
+                                        if (snapshot.data?.nutriscore != null &&
+                                            snapshot.data!.nutriscore !=
+                                                'not-applicable')
+                                          Card(
+                                            child: ListTile(
+                                              leading: Padding(
                                                 padding:
                                                     const EdgeInsets.all(8.0),
-                                                child: Text(
-                                                  '${snapshot.data?.ingredients}',
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontFamily: 'Poly',
-                                                    fontWeight: FontWeight.w400,
+                                                child: Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.2,
+                                                  child: SvgPicture.asset(
+                                                    'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
+                                                    fit: BoxFit.scaleDown,
                                                   ),
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      if (snapshot.data?.ecoscoreGrade !=
-                                              null &&
-                                          snapshot.data!.ecoscoreGrade !=
-                                              'not-applicable' &&
-                                          snapshot.data!.ecoscoreGrade !=
-                                              'unknown')
-                                        Card(
-                                          child: ListTile(
-                                            leading: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.2,
-                                                child: SvgPicture.asset(
-                                                  'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
-                                                  fit: BoxFit.scaleDown,
+                                              title: Text(
+                                                '${getNutriScoreMessage(snapshot.data?.nutriscore ?? 'Unknown')}',
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'Poly',
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                             ),
-                                            title: Text(
-                                              '${getEcoScoreMessage(snapshot.data?.ecoscoreGrade ?? 'Unknown')}',
-                                              style: const TextStyle(
-                                                fontSize: 20,
-                                                fontFamily: 'Poly',
-                                                fontWeight: FontWeight.w500,
+                                          ),
+                                        if (snapshot.data?.ingredientsText
+                                                ?.isNotEmpty ??
+                                            false)
+                                          Card(
+                                            child: ExpansionTile(
+                                              title: Text(
+                                                '${(snapshot.data!.ingredientsText ?? '').split(',').length} ingredient${(snapshot.data!.ingredientsText ?? '').split(',').length > 1 ? 's' : ''}',
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'Poly',
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
+                                              leading: const Icon(Icons.list),
+                                              collapsedTextColor: Colors
+                                                  .black, // Color of the title text when the tile is collapsed
+                                              textColor: Colors
+                                                  .blue, // Color of the title text when the tile is expanded
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    '${snapshot.data?.ingredients}',
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontFamily: 'Poly',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ),
-                                      if (snapshot.data?.novaGroup != null &&
-                                          snapshot.data!.novaGroup !=
-                                              'not-applicable')
-                                        Card(
-                                          child: ListTile(
-                                            leading: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.1,
-                                                child: SvgPicture.asset(
-                                                  'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
-                                                  fit: BoxFit.scaleDown,
+                                        if (snapshot.data?.ecoscoreGrade !=
+                                                null &&
+                                            snapshot.data!.ecoscoreGrade !=
+                                                'not-applicable' &&
+                                            snapshot.data!.ecoscoreGrade !=
+                                                'unknown')
+                                          Card(
+                                            child: ListTile(
+                                              leading: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.2,
+                                                  child: SvgPicture.asset(
+                                                    'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
+                                                    fit: BoxFit.scaleDown,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(
+                                                '${getEcoScoreMessage(snapshot.data?.ecoscoreGrade ?? 'Unknown')}',
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'Poly',
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                             ),
-                                            title: Text(
-                                              '${getNovaGroupMessage(snapshot.data?.novaGroup.toString() ?? 'Unknown')}',
-                                              style: const TextStyle(
-                                                fontSize: 20,
-                                                fontFamily: 'Poly',
-                                                fontWeight: FontWeight.w500,
+                                          ),
+                                        if (snapshot.data?.novaGroup != null &&
+                                            snapshot.data!.novaGroup !=
+                                                'not-applicable')
+                                          Card(
+                                            child: ListTile(
+                                              leading: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.1,
+                                                  child: SvgPicture.asset(
+                                                    'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
+                                                    fit: BoxFit.scaleDown,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(
+                                                '${getNovaGroupMessage(snapshot.data?.novaGroup.toString() ?? 'Unknown')}',
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'Poly',
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                return Text(errorMessage);
-                              }
-                            }
-                          },
-                        ),
+                                      ],
+                                    ),
+                                  );
+                                  // } else {
+                                  //   return Text(errorMessage);
+                                  // }
+                                }
+                              },
+                            ),
                 ),
               ],
             ),
@@ -498,9 +524,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        'History',
+                        'select',
                         style: TextStyle(
-                            fontSize: 20.0, fontWeight: FontWeight.bold),
+                            fontFamily: 'Poly',
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.bold),
                       ),
                       IconButton(
                         icon: Icon(Icons.delete),
@@ -526,6 +554,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                           await SharedPreferences.getInstance();
                                       await prefs.remove('history');
                                       Navigator.of(context).pop();
+                                      setState(() {
+                                        historyVersion++;
+                                      });
                                     },
                                   ),
                                 ],
@@ -541,28 +572,31 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: FutureBuilder<List<String>>(
                     future: SharedPreferences.getInstance()
                         .then((prefs) => prefs.getStringList('history') ?? []),
+                    key: ValueKey(historyVersion),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
                       } else {
                         if (snapshot.data!.isEmpty) {
-                          return const Center(
+                          return Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Icon(
                                   Icons.access_time,
-                                  size: 50.0,
+                                  size: MediaQuery.of(context).size.height *
+                                      0.15, // 20% of screen height
+                                  color:
+                                      Colors.black, // Set the color as needed
                                 ),
                                 Text(
-                                  'Welcome to the History page!',
+                                  'Scan products\nto get a history.',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'Your viewed products will appear here.',
-                                  style: TextStyle(fontSize: 16.0),
+                                    fontSize: 22,
+                                    fontFamily: 'Poly',
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ],
                             ),
@@ -753,12 +787,19 @@ class _MyHomePageState extends State<MyHomePage> {
         history.add(jsonEncode(result.product!.toJson()));
         await prefs.setStringList('history', history);
 
+        setState(() {
+          isError = false;
+        });
+
         return result.product!;
       } else {
         throw Exception('Product not found');
       }
     } catch (e) {
       debugPrint('Failed to get product info: $e');
+      setState(() {
+        isError = true;
+      });
       throw Exception('Failed to get product info: $e');
     }
   }
