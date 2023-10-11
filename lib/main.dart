@@ -489,100 +489,188 @@ class _MyHomePageState extends State<MyHomePage> {
           ), // Scan page
           Container(
             color: Colors.white,
-            child: FutureBuilder<List<String>>(
-              future: SharedPreferences.getInstance()
-                  .then((prefs) => prefs.getStringList('history') ?? []),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else {
-                  List<Product> products = snapshot.data!
-                      .map((e) => Product.fromJson(jsonDecode(e)))
-                      .toList();
-                  return ListView.builder(
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      Product product = products[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Card(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Padding(
+            child: Column(
+              children: [
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        'History',
+                        style: TextStyle(
+                            fontSize: 20.0, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Clear all history?'),
+                                content:
+                                    Text('This will delete all your history.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('Clear'),
+                                    onPressed: () async {
+                                      SharedPreferences prefs =
+                                          await SharedPreferences.getInstance();
+                                      await prefs.remove('history');
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: FutureBuilder<List<String>>(
+                    future: SharedPreferences.getInstance()
+                        .then((prefs) => prefs.getStringList('history') ?? []),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else {
+                        if (snapshot.data!.isEmpty) {
+                          return const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.access_time,
+                                  size: 50.0,
+                                ),
+                                Text(
+                                  'Welcome to the History page!',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'Your viewed products will appear here.',
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          List<Product> products = snapshot.data!
+                              .map((e) => Product.fromJson(jsonDecode(e)))
+                              .toList();
+                          return ListView.builder(
+                            itemCount: products.length,
+                            itemBuilder: (context, index) {
+                              Product product = products[index];
+                              return Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.2,
-                                  child: product.imageFrontSmallUrl != null
-                                      ? Image.network(product.imageFrontUrl!,
-                                          fit: BoxFit.scaleDown)
-                                      : const Icon(Icons.shopping_cart,
-                                          size: 24.0),
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    ListTile(
-                                      title: Text(
-                                        '${product.productName ?? 'Unknown Product'}',
-                                        style: const TextStyle(
-                                          fontSize: 24,
-                                          fontFamily: 'Poly',
-                                          fontWeight: FontWeight.w700,
+                                child: Card(
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.2,
+                                          child: product.imageFrontSmallUrl !=
+                                                  null
+                                              ? Image.network(
+                                                  product.imageFrontUrl!,
+                                                  fit: BoxFit.scaleDown)
+                                              : const Icon(Icons.shopping_cart,
+                                                  size: 24.0),
                                         ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16.0, vertical: 8),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          if (product.nutriscore != null &&
-                                              product.nutriscore !=
-                                                  'not-applicable')
-                                            Expanded(
-                                                child: SvgPicture.asset(
-                                                    'assets/images/nutriscore-${product.nutriscore}.svg',
-                                                    height: 50)),
-                                          SizedBox(width: 10),
-                                          if (product.ecoscoreGrade != null &&
-                                              product.ecoscoreGrade !=
-                                                  'not-applicable' &&
-                                              product.ecoscoreGrade !=
-                                                  'unknown')
-                                            Expanded(
-                                                child: SvgPicture.asset(
-                                                    'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
-                                                    height: 50)),
-                                          SizedBox(width: 10),
-                                          if (product.novaGroup != null &&
-                                              product.novaGroup !=
-                                                  'not-applicable')
-                                            Expanded(
-                                                child: SvgPicture.asset(
-                                                    'assets/images/nova-group-${product.novaGroup}.svg',
-                                                    height: 50)),
-                                        ],
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            ListTile(
+                                              title: Text(
+                                                '${product.productName ?? 'Unknown Product'}',
+                                                style: const TextStyle(
+                                                  fontSize: 24,
+                                                  fontFamily: 'Poly',
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16.0,
+                                                      vertical: 8),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  if (product.nutriscore !=
+                                                          null &&
+                                                      product.nutriscore !=
+                                                          'not-applicable')
+                                                    Expanded(
+                                                        child: SvgPicture.asset(
+                                                            'assets/images/nutriscore-${product.nutriscore}.svg',
+                                                            height: 50)),
+                                                  SizedBox(width: 10),
+                                                  if (product.ecoscoreGrade !=
+                                                          null &&
+                                                      product.ecoscoreGrade !=
+                                                          'not-applicable' &&
+                                                      product.ecoscoreGrade !=
+                                                          'unknown')
+                                                    Expanded(
+                                                        child: SvgPicture.asset(
+                                                            'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
+                                                            height: 50)),
+                                                  SizedBox(width: 10),
+                                                  if (product.novaGroup !=
+                                                          null &&
+                                                      product.novaGroup !=
+                                                          'not-applicable')
+                                                    Expanded(
+                                                        child: SvgPicture.asset(
+                                                            'assets/images/nova-group-${product.novaGroup}.svg',
+                                                            height: 50)),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+                              );
+                            },
+                          );
+                        }
+                      }
                     },
-                  );
-                }
-              },
+                  ),
+                ),
+              ],
             ),
           ), // History page
         ],
@@ -660,7 +748,6 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       ProductResultV3 result = await OpenFoodAPIClient.getProductV3(config);
       if (result.product != null) {
-        // Save the product data
         SharedPreferences prefs = await SharedPreferences.getInstance();
         List<String> history = prefs.getStringList('history') ?? [];
         history.add(jsonEncode(result.product!.toJson()));
