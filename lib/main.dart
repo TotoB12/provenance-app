@@ -250,7 +250,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 size: MediaQuery.of(context).size.height * 0.15,
                                 color: Colors.red,
                               ),
-                              Text(
+                              const Text(
                                 'There has been an error,\nplease try again.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -518,12 +518,12 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               children: [
                 Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 5.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(
+                      const Text(
                         'select',
                         style: TextStyle(
                             fontFamily: 'Poly',
@@ -531,18 +531,18 @@ class _MyHomePageState extends State<MyHomePage> {
                             fontWeight: FontWeight.bold),
                       ),
                       IconButton(
-                        icon: Icon(Icons.delete),
+                        icon: const Icon(Icons.delete),
                         onPressed: () {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                title: Text('Clear all history?'),
-                                content:
-                                    Text('This will delete all your history.'),
+                                title: const Text('Clear all history?'),
+                                content: const Text(
+                                    'This will delete all your history.'),
                                 actions: <Widget>[
                                   TextButton(
-                                    child: Text('Cancel'),
+                                    child: const Text('Cancel'),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
@@ -589,7 +589,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color:
                                       Colors.black, // Set the color as needed
                                 ),
-                                Text(
+                                const Text(
                                   'Scan products\nto get a history.',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
