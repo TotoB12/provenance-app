@@ -51,12 +51,30 @@ class _MyHomePageState extends State<MyHomePage> {
   int historyVersion = 0;
   bool isError = false;
   bool isDeleteConfirmationVisible = false;
+  String searchQuery = '';
+  Future<SearchResult>? searchResult;
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
     formats: [BarcodeFormat.ean13, BarcodeFormat.upcA],
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
+
+  Future<SearchResult> searchProducts(String query) async {
+    ProductSearchQueryConfiguration configuration =
+        ProductSearchQueryConfiguration(
+      parametersList: <Parameter>[
+        SearchTerms(terms: [query]),
+        PageSize(size: 10),
+      ],
+      version: ProductQueryVersion.v3, // or ProductQueryVersion.V3
+    );
+
+    return await OpenFoodAPIClient.searchProducts(
+      User(userId: '', password: ''),
+      configuration,
+    );
+  }
 
   // PageController _pageController = PageController();
 
@@ -128,21 +146,92 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Icon(
-                  Icons.search,
-                  size: MediaQuery.of(context).size.height * 0.15,
-                  color: Colors.black,
-                ),
-                const Text(
-                  'Search for products\n above.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontFamily: 'Poly',
-                    fontWeight: FontWeight.w700,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                        searchResult = searchProducts(searchQuery);
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      labelText: "Search",
+                      hintText: "Search for products",
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                      ),
+                    ),
                   ),
+                ),
+                FutureBuilder<SearchResult>(
+                  future: searchResult,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasData &&
+                        snapshot.data!.products != null) {
+                      return Expanded(
+                        child: ListView.builder(
+                          itemCount: snapshot.data!.products!.length,
+                          itemBuilder: (context, index) {
+                            Product product = snapshot.data!.products![index];
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Card(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.2,
+                                        child: product.imageFrontSmallUrl !=
+                                                null
+                                            ? Image.network(
+                                                product.imageFrontUrl!,
+                                                fit: BoxFit.scaleDown)
+                                            : const Icon(Icons.shopping_cart,
+                                                size: 24.0),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          ListTile(
+                                            title: Text(
+                                              '${product.productName ?? 'Unknown Product'}',
+                                              style: const TextStyle(
+                                                fontSize: 24,
+                                                fontFamily: 'Poly',
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          // Add more details here as needed
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    } else {
+                      return Text('No results found');
+                    }
+                  },
                 ),
               ],
             ),
