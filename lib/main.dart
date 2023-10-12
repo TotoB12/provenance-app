@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isWelcomeScreen = true;
   int historyVersion = 0;
   bool isError = false;
+  bool isDeleteConfirmationVisible = false;
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
@@ -267,18 +268,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  // ClipRRect(
-                                  //   borderRadius: BorderRadius.circular(
-                                  //       20), // Adjust as needed
-                                  //   child: Image.asset(
-                                  //     'assets/icons/icon.png',
-                                  //     width: MediaQuery.of(context).size.width *
-                                  //         0.5, // 50% of screen width
-                                  //     height: MediaQuery.of(context).size.height *
-                                  //         0.2, // 20% of screen height
-                                  //     fit: BoxFit.cover,
-                                  //   ),
-                                  // ),
                                   Icon(
                                     Icons.camera_enhance,
                                     size: MediaQuery.of(context).size.height *
@@ -520,49 +509,78 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10.0, vertical: 5.0),
+                  height: 50,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       const Text(
-                        'select',
+                        'History',
                         style: TextStyle(
                             fontFamily: 'Poly',
                             fontSize: 17.0,
                             fontWeight: FontWeight.bold),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Clear all history?'),
-                                content: const Text(
-                                    'This will delete all your history.'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: const Text('Cancel'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text('Clear'),
-                                    onPressed: () async {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      await prefs.remove('history');
-                                      Navigator.of(context).pop();
-                                      setState(() {
-                                        historyVersion++;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
+                      StatefulBuilder(
+                        builder:
+                            (BuildContext context, StateSetter dialogSetState) {
+                          return isDeleteConfirmationVisible
+                              ? Row(
+                                  children: [
+                                    const Text(
+                                      'Clear all history?',
+                                      style: TextStyle(
+                                        fontFamily: 'Poly',
+                                        fontSize: 17.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    TextButton(
+                                      child: const Text(
+                                        'Yes',
+                                        style: TextStyle(
+                                          fontFamily: 'Poly',
+                                          fontSize: 17.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        SharedPreferences prefs =
+                                            await SharedPreferences
+                                                .getInstance();
+                                        await prefs.remove('history');
+                                        setState(() {
+                                          historyVersion++;
+                                        });
+                                        dialogSetState(() {
+                                          isDeleteConfirmationVisible = false;
+                                        });
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text(
+                                        'No',
+                                        style: TextStyle(
+                                          fontFamily: 'Poly',
+                                          fontSize: 17.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        dialogSetState(() {
+                                          isDeleteConfirmationVisible = false;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                )
+                              : IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    dialogSetState(() {
+                                      isDeleteConfirmationVisible = true;
+                                    });
+                                  },
+                                );
                         },
                       ),
                     ],
@@ -584,13 +602,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               children: <Widget>[
                                 Icon(
                                   Icons.access_time,
-                                  size: MediaQuery.of(context).size.height *
-                                      0.15, // 20% of screen height
-                                  color:
-                                      Colors.black, // Set the color as needed
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.15,
+                                  color: Colors.black,
                                 ),
                                 const Text(
-                                  'Scan products\nto get a history.',
+                                  'Scan a product\nto get a history.',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 22,
