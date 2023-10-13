@@ -6,6 +6,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'dart:async'; // Import this at the top of your file
 
 void main() {
   OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Provenance');
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Provenance',
       theme: ThemeData(
-        primaryColor: Color(0xFF262626), // RGB(38, 38, 38)
+        primaryColor: const Color(0xFF262626), // RGB(38, 38, 38)
       ),
       home: MyHomePage(title: 'Provenance'),
     );
@@ -53,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isDeleteConfirmationVisible = false;
   String searchQuery = '';
   Future<SearchResult>? searchResult;
+  Timer? _debounce;
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
@@ -65,13 +67,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ProductSearchQueryConfiguration(
       parametersList: <Parameter>[
         SearchTerms(terms: [query]),
-        PageSize(size: 10),
+        const PageSize(size: 10),
       ],
-      version: ProductQueryVersion.v3, // or ProductQueryVersion.V3
+      version: ProductQueryVersion.v3,
     );
 
     return await OpenFoodAPIClient.searchProducts(
-      User(userId: '', password: ''),
+      const User(userId: '', password: ''),
       configuration,
     );
   }
@@ -152,9 +154,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     onChanged: (value) {
-                      setState(() {
-                        searchQuery = value;
-                        searchResult = searchProducts(searchQuery);
+                      if (_debounce?.isActive ?? false) _debounce?.cancel();
+                      _debounce = Timer(const Duration(milliseconds: 500), () {
+                        setState(() {
+                          searchQuery = value;
+                          searchResult = searchProducts(searchQuery);
+                        });
                       });
                     },
                     decoration: const InputDecoration(
@@ -167,11 +172,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
+                Center(
+                  child: Container(
+                    height: 0.4,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    color: Colors.black,
+                  ),
+                ),
                 FutureBuilder<SearchResult>(
                   future: searchResult,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     } else if (snapshot.hasData &&
                         snapshot.data!.products != null) {
                       return Expanded(
@@ -179,57 +191,121 @@ class _MyHomePageState extends State<MyHomePage> {
                           itemCount: snapshot.data!.products!.length,
                           itemBuilder: (context, index) {
                             Product product = snapshot.data!.products![index];
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Card(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.2,
-                                        child: product.imageFrontSmallUrl !=
-                                                null
-                                            ? Image.network(
-                                                product.imageFrontUrl!,
-                                                fit: BoxFit.scaleDown)
-                                            : const Icon(Icons.shopping_cart,
-                                                size: 24.0),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          ListTile(
-                                            title: Text(
-                                              '${product.productName ?? 'Unknown Product'}',
-                                              style: const TextStyle(
-                                                fontSize: 24,
-                                                fontFamily: 'Poly',
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          // Add more details here as needed
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                            return Column(
+                              children: <Widget>[
+                                Center(
+                                  child: Container(
+                                    height:
+                                        0.4, // Adjust the thickness of the bar here
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Card(
+                                    color: const Color.fromARGB(
+                                        255, 250, 250, 250),
+                                    elevation: 0.0,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.2,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.2,
+                                            child: product.imageFrontSmallUrl !=
+                                                    null
+                                                ? Image.network(
+                                                    product.imageFrontUrl!,
+                                                    fit: BoxFit.contain)
+                                                : const Icon(
+                                                    Icons.shopping_cart,
+                                                    size: 24.0),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              ListTile(
+                                                title: Text(
+                                                  '${product.productName ?? 'Unknown Product'}',
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontFamily: 'Poly',
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16.0,
+                                                        vertical: 8),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    if (product.nutriscore !=
+                                                            null &&
+                                                        product.nutriscore !=
+                                                            'not-applicable')
+                                                      Expanded(
+                                                          child: SvgPicture.asset(
+                                                              'assets/images/nutriscore-${product.nutriscore}.svg',
+                                                              height: 50)),
+                                                    const SizedBox(width: 10),
+                                                    if (product.ecoscoreGrade !=
+                                                            null &&
+                                                        product.ecoscoreGrade !=
+                                                            'not-applicable' &&
+                                                        product.ecoscoreGrade !=
+                                                            'unknown')
+                                                      Expanded(
+                                                          child: SvgPicture.asset(
+                                                              'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
+                                                              height: 50)),
+                                                    const SizedBox(width: 10),
+                                                    if (product.novaGroup !=
+                                                            null &&
+                                                        product.novaGroup !=
+                                                            'not-applicable')
+                                                      Expanded(
+                                                          child: SvgPicture.asset(
+                                                              'assets/images/nova-group-${product.novaGroup}.svg',
+                                                              height: 50)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             );
                           },
                         ),
                       );
                     } else {
-                      return Text('No results found');
+                      return const Text('No results found');
                     }
                   },
                 ),
