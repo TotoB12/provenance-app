@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:async'; // Import this at the top of your file
 
+const Color mainColor = Color.fromARGB(255, 245, 245, 245);
+
 void main() {
   OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Provenance');
 
@@ -18,6 +20,98 @@ void main() {
   OpenFoodAPIConfiguration.globalCountry = OpenFoodFactsCountry.USA;
 
   runApp(MyApp());
+}
+
+class ProductCard extends StatelessWidget {
+  final Product product;
+
+  ProductCard({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Center(
+          child: Container(
+            height: 0.4,
+            width: MediaQuery.of(context).size.width * 0.9,
+            color: Colors.black,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            color: const Color.fromARGB(255, 245, 245, 245),
+            elevation: 0.0,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                if (product.imageFrontSmallUrl != null)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      height: MediaQuery.of(context).size.width * 0.2,
+                      child: Image.network(product.imageFrontUrl!,
+                          fit: BoxFit.contain),
+                    ),
+                  ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      ListTile(
+                        title: Text(
+                          '${product.productName ?? 'Unknown Product'}',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontFamily: 'Poly',
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            if (product.nutriscore != null &&
+                                product.nutriscore != 'not-applicable')
+                              Expanded(
+                                  child: SvgPicture.asset(
+                                      'assets/images/nutriscore-${product.nutriscore}.svg',
+                                      height: 50)),
+                            const SizedBox(width: 10),
+                            if (product.ecoscoreGrade != null &&
+                                product.ecoscoreGrade != 'not-applicable' &&
+                                product.ecoscoreGrade != 'unknown')
+                              Expanded(
+                                  child: SvgPicture.asset(
+                                      'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
+                                      height: 50)),
+                            const SizedBox(width: 10),
+                            if (product.novaGroup != null &&
+                                product.novaGroup != 'not-applicable')
+                              Expanded(
+                                  child: SvgPicture.asset(
+                                      'assets/images/nova-group-${product.novaGroup}.svg',
+                                      height: 50)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -55,6 +149,22 @@ class _MyHomePageState extends State<MyHomePage> {
   String searchQuery = '';
   Future<SearchResult>? searchResult;
   Timer? _debounce;
+  Map<String, bool> dropdownValue = {
+    'No Additives': false,
+    'Vegan': false,
+    'Vegetarian': false,
+    'No Palm Oil': false,
+  };
+  SortOption currentSortOption = SortOption.POPULARITY;
+  Map<SortOption, String> sortOptionText = {
+    SortOption.POPULARITY: 'Popularity',
+    SortOption.PRODUCT_NAME: 'Product Name',
+    SortOption.CREATED: 'Created',
+    SortOption.EDIT: 'Edit',
+    SortOption.NOTHING: 'Nothing',
+    SortOption.ECOSCORE: 'Ecoscore',
+    SortOption.NUTRISCORE: 'Nutriscore',
+  };
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
@@ -63,12 +173,31 @@ class _MyHomePageState extends State<MyHomePage> {
   );
 
   Future<SearchResult> searchProducts(String query) async {
+    List<Parameter> parameters = <Parameter>[
+      SearchTerms(terms: [query]),
+      const PageSize(size: 20),
+      SortBy(option: currentSortOption),
+    ];
+
+    if (dropdownValue['No Additives'] == true) {
+      parameters.add(const WithoutAdditives());
+    }
+    if (dropdownValue['Vegan'] == true) {
+      parameters.add(
+          const IngredientsAnalysisParameter(veganStatus: VeganStatus.VEGAN));
+    }
+    if (dropdownValue['Vegetarian'] == true) {
+      parameters.add(const IngredientsAnalysisParameter(
+          vegetarianStatus: VegetarianStatus.VEGETARIAN));
+    }
+    if (dropdownValue['No Palm Oil'] == true) {
+      parameters.add(const IngredientsAnalysisParameter(
+          palmOilFreeStatus: PalmOilFreeStatus.PALM_OIL_FREE));
+    }
+
     ProductSearchQueryConfiguration configuration =
         ProductSearchQueryConfiguration(
-      parametersList: <Parameter>[
-        SearchTerms(terms: [query]),
-        const PageSize(size: 10),
-      ],
+      parametersList: parameters,
       version: ProductQueryVersion.v3,
     );
 
@@ -148,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Center(
             child: Container(
-              color: const Color.fromARGB(255, 245, 245, 245),
+              color: mainColor,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
@@ -175,6 +304,90 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   ),
+                  // Padding(
+                  //   // padding: const EdgeInsets.all(8.0),
+                  //   padding: const EdgeInsets.only(
+                  //       left: 20.0, right: 8.0, top: 8.0, bottom: 10.0),
+                  //   child:
+
+                  DefaultTextStyle(
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Poly',
+                      color: Colors.black,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      // set spacing between the elements
+
+                      children: [
+                        // Padding(
+                        //   padding: const EdgeInsets.all(4.0),
+                        //   child:
+                        PopupMenuButton<String>(
+                          onSelected: (String value) {
+                            setState(() {
+                              dropdownValue[value] = !dropdownValue[value]!;
+                              searchResult = searchProducts(searchQuery);
+                            });
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return dropdownValue.keys.map((String value) {
+                              return CheckedPopupMenuItem<String>(
+                                value: value,
+                                checked: dropdownValue[value]!,
+                                child: Text(value),
+                              );
+                            }).toList();
+                          },
+                          child: Row(
+                            children: [
+                              Icon(Icons.filter_list),
+                              SizedBox(width: 8),
+                              Text(
+                                'Filters (${dropdownValue.values.where((v) => v).length})',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Poly',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // ),
+                        // Padding(
+                        //   padding: const EdgeInsets.all(4.0),
+                        //   child:
+                        Row(
+                          children: [
+                            Text('Sort by: '),
+                            DropdownButton<SortOption>(
+                              value: currentSortOption,
+                              icon: const Icon(Icons.arrow_downward),
+                              onChanged: (SortOption? newValue) {
+                                setState(() {
+                                  currentSortOption = newValue!;
+                                  searchResult = searchProducts(searchQuery);
+                                });
+                              },
+                              items: SortOption.values
+                                  .map<DropdownMenuItem<SortOption>>(
+                                      (SortOption value) {
+                                return DropdownMenuItem<SortOption>(
+                                  value: value,
+                                  child: Text(sortOptionText[value]!,
+                                      style:
+                                          const TextStyle(fontFamily: 'Poly')),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                  // ),
                   Center(
                     child: Container(
                       height: 0.4,
@@ -190,125 +403,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       } else if (snapshot.hasData &&
                           snapshot.data!.products != null) {
                         return Expanded(
-                          child: ListView.builder(
-                            itemCount: snapshot.data!.products!.length,
-                            itemBuilder: (context, index) {
-                              Product product = snapshot.data!.products![index];
-                              return Column(
-                                children: <Widget>[
-                                  Center(
-                                    child: Container(
-                                      height:
-                                          0.4, // Adjust the thickness of the bar here
-                                      width: MediaQuery.of(context).size.width *
-                                          0.9,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Card(
-                                      color: const Color.fromARGB(
-                                          255, 245, 245, 245),
-                                      elevation: 0.0,
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.2,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.2,
-                                              child: product
-                                                          .imageFrontSmallUrl !=
-                                                      null
-                                                  ? Image.network(
-                                                      product.imageFrontUrl!,
-                                                      fit: BoxFit.contain)
-                                                  : const Icon(
-                                                      Icons.shopping_cart,
-                                                      size: 24.0),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                ListTile(
-                                                  title: Text(
-                                                    '${product.productName ?? 'Unknown Product'}',
-                                                    style: const TextStyle(
-                                                      fontSize: 22,
-                                                      fontFamily: 'Poly',
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 16.0,
-                                                      vertical: 8),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: [
-                                                      if (product.nutriscore !=
-                                                              null &&
-                                                          product.nutriscore !=
-                                                              'not-applicable')
-                                                        Expanded(
-                                                            child: SvgPicture.asset(
-                                                                'assets/images/nutriscore-${product.nutriscore}.svg',
-                                                                height: 50)),
-                                                      const SizedBox(width: 10),
-                                                      if (product.ecoscoreGrade !=
-                                                              null &&
-                                                          product.ecoscoreGrade !=
-                                                              'not-applicable' &&
-                                                          product.ecoscoreGrade !=
-                                                              'unknown')
-                                                        Expanded(
-                                                            child: SvgPicture.asset(
-                                                                'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
-                                                                height: 50)),
-                                                      const SizedBox(width: 10),
-                                                      if (product.novaGroup !=
-                                                              null &&
-                                                          product.novaGroup !=
-                                                              'not-applicable')
-                                                        Expanded(
-                                                            child: SvgPicture.asset(
-                                                                'assets/images/nova-group-${product.novaGroup}.svg',
-                                                                height: 50)),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        );
+                            child: ListView.builder(
+                          itemCount: snapshot.data!.products!.length,
+                          itemBuilder: (context, index) {
+                            Product product = snapshot.data!.products![index];
+                            return ProductCard(product: product);
+                          },
+                        ));
                       } else {
                         return const Text('No results found');
                       }
@@ -349,7 +450,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       left: 10.0,
                       child: Container(
                         decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 245, 245, 245),
+                          color: mainColor,
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -371,7 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           20, // Center the button
                       child: Container(
                         decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 245, 245, 245),
+                          color: mainColor,
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -394,9 +495,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ? Container()
                           : Container(
                               decoration: BoxDecoration(
-                                color: isFlashOn
-                                    ? Colors.yellow
-                                    : const Color.fromARGB(255, 245, 245, 245),
+                                color: isFlashOn ? Colors.yellow : mainColor,
                                 shape: BoxShape.circle,
                               ),
                               child: IconButton(
@@ -676,7 +775,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ), // Scan page
           Container(
-            color: const Color.fromARGB(255, 245, 245, 245),
+            color: mainColor,
             child: Column(
               children: [
                 Container(
@@ -798,119 +897,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           return ListView.builder(
                             itemCount: products.length,
                             itemBuilder: (context, index) {
-                              Product product = products[index];
-                              return Column(
-                                children: <Widget>[
-                                  Center(
-                                    child: Container(
-                                      height:
-                                          0.4, // Adjust the thickness of the bar here
-                                      width: MediaQuery.of(context).size.width *
-                                          0.9,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Card(
-                                      color: const Color.fromARGB(
-                                          255, 245, 245, 245),
-                                      elevation: 0.0,
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.2,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.2,
-                                              child: product
-                                                          .imageFrontSmallUrl !=
-                                                      null
-                                                  ? Image.network(
-                                                      product.imageFrontUrl!,
-                                                      fit: BoxFit.contain)
-                                                  : const Icon(
-                                                      Icons.shopping_cart,
-                                                      size: 24.0),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                ListTile(
-                                                  title: Text(
-                                                    '${product.productName ?? 'Unknown Product'}',
-                                                    style: const TextStyle(
-                                                      fontSize: 22,
-                                                      fontFamily: 'Poly',
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 16.0,
-                                                      vertical: 8),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: [
-                                                      if (product.nutriscore !=
-                                                              null &&
-                                                          product.nutriscore !=
-                                                              'not-applicable')
-                                                        Expanded(
-                                                            child: SvgPicture.asset(
-                                                                'assets/images/nutriscore-${product.nutriscore}.svg',
-                                                                height: 50)),
-                                                      const SizedBox(width: 10),
-                                                      if (product.ecoscoreGrade !=
-                                                              null &&
-                                                          product.ecoscoreGrade !=
-                                                              'not-applicable' &&
-                                                          product.ecoscoreGrade !=
-                                                              'unknown')
-                                                        Expanded(
-                                                            child: SvgPicture.asset(
-                                                                'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
-                                                                height: 50)),
-                                                      const SizedBox(width: 10),
-                                                      if (product.novaGroup !=
-                                                              null &&
-                                                          product.novaGroup !=
-                                                              'not-applicable')
-                                                        Expanded(
-                                                            child: SvgPicture.asset(
-                                                                'assets/images/nova-group-${product.novaGroup}.svg',
-                                                                height: 50)),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
+                              return ProductCard(product: products[index]);
                             },
                           );
                         }
