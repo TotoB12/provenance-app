@@ -202,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final SpinKitSpinningLines spinny = const SpinKitSpinningLines(
     color: accentColor,
     size: 40.0,
-    lineWidth: 10.0,
+    lineWidth: 7.0,
   );
   ScrollController scrollController = ScrollController();
   String errorMessage =
@@ -447,6 +447,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   // ),
+                  const SizedBox(
+                    height: 8,
+                  ),
                   Center(
                     child: Container(
                       height: 0.4,
@@ -454,15 +457,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(
-                    height: 12,
-                  ),
                   FutureBuilder<SearchResult>(
                     future: searchResult,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        loadingTimer
-                            ?.cancel(); // cancel the previous timer if it exists
+                        loadingTimer?.cancel();
                         loadingTimer = Timer(Duration(seconds: 10), () {
                           setState(() {
                             isLoadingLong = true;
@@ -470,10 +469,16 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                         return Column(
                           children: [
+                            const SizedBox(
+                              height: 20,
+                            ),
                             spinny,
                             if (isLoadingLong)
-                              Text(
-                                  'This is taking longer than expected, please wait.'),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                            const Text(
+                                'This is taking longer than expected, please be patient.'),
                           ],
                         );
                       } else if (snapshot.hasData &&
