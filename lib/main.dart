@@ -58,6 +58,16 @@ class ProductCard extends StatelessWidget {
                       child: Image.network(product.imageFrontUrl!,
                           fit: BoxFit.contain),
                     ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      height: MediaQuery.of(context).size.width * 0.2,
+                      child: Icon(Icons.shopping_cart,
+                          size: 50), // Replace with your own icon
+                    ),
                   ),
                 Expanded(
                   child: Column(
@@ -83,46 +93,46 @@ class ProductCard extends StatelessWidget {
                           children: [
                             if (product.nutriscore != null &&
                                 product.nutriscore != 'not-applicable')
-                              Expanded(
-                                child: SvgPicture.asset(
-                                    'assets/images/nutriscore-${product.nutriscore}.svg',
-                                    height: 50),
-                              )
+                              // Expanded(
+                              SvgPicture.asset(
+                                  'assets/images/nutriscore-${product.nutriscore}.svg',
+                                  height: 50)
+                            // )
                             else
-                              Expanded(
-                                child: SvgPicture.asset(
-                                    'assets/images/nutriscore-unknown.svg',
-                                    height: 50),
-                              ),
+                              // Expanded(
+                              SvgPicture.asset(
+                                  'assets/images/nutriscore-unknown.svg',
+                                  height: 50),
+                            // ),
                             const SizedBox(width: 10),
                             if (product.ecoscoreGrade != null &&
                                 product.ecoscoreGrade != 'not-applicable' &&
                                 product.ecoscoreGrade != 'unknown')
-                              Expanded(
-                                child: SvgPicture.asset(
-                                    'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
-                                    height: 50),
-                              )
+                              // Expanded(
+                              SvgPicture.asset(
+                                  'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
+                                  height: 50)
+                            // )
                             else
-                              Expanded(
-                                child: SvgPicture.asset(
-                                    'assets/images/ecoscore-unknown.svg',
-                                    height: 50),
-                              ),
+                              // Expanded(
+                              SvgPicture.asset(
+                                  'assets/images/ecoscore-unknown.svg',
+                                  height: 50),
+                            // ),
                             const SizedBox(width: 10),
                             if (product.novaGroup != null &&
                                 product.novaGroup != 'not-applicable')
-                              Expanded(
-                                child: SvgPicture.asset(
-                                    'assets/images/nova-group-${product.novaGroup}.svg',
-                                    height: 50),
-                              )
+                              // Expanded(
+                              SvgPicture.asset(
+                                  'assets/images/nova-group-${product.novaGroup}.svg',
+                                  height: 50)
+                            // )
                             else
-                              Expanded(
-                                child: SvgPicture.asset(
-                                    'assets/images/nova-group-unknown.svg',
-                                    height: 50),
-                              ),
+                              // Expanded(
+                              SvgPicture.asset(
+                                  'assets/images/nova-group-unknown.svg',
+                                  height: 50)
+                            // ),
                           ],
                         ),
                       ),
