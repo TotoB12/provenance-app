@@ -168,6 +168,11 @@ class _MyHomePageState extends State<MyHomePage> {
   };
   bool isLoadingLong = false;
   Timer? loadingTimer;
+  final SpinKitSpinningLines spinny = const SpinKitSpinningLines(
+    color: accentColor,
+    size: 40.0,
+    lineWidth: 10.0,
+  );
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
@@ -433,11 +438,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                         return Column(
                           children: [
-                            const SpinKitSpinningLines(
-                              color: accentColor,
-                              size: 40.0,
-                              lineWidth: 10.0,
-                            ),
+                            spinny,
                             if (isLoadingLong)
                               Text(
                                   'This is taking longer than expected, please wait.'),
