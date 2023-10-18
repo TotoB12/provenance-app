@@ -122,6 +122,8 @@ class MyApp extends StatelessWidget {
       title: 'Provenance',
       theme: ThemeData(
         primaryColor: const Color(0xFF262626), // RGB(38, 38, 38)
+        colorScheme:
+            ThemeData().colorScheme.copyWith(primary: const Color(0xFF262626)),
       ),
       home: const MyHomePage(title: 'Provenance'),
     );
@@ -159,13 +161,11 @@ class _MyHomePageState extends State<MyHomePage> {
   SortOption currentSortOption = SortOption.POPULARITY;
   Map<SortOption, String> sortOptionText = {
     SortOption.POPULARITY: 'Popularity',
-    SortOption.PRODUCT_NAME: 'Product Name',
-    SortOption.CREATED: 'Created',
-    SortOption.EDIT: 'Edit',
-    SortOption.NOTHING: 'Nothing',
     SortOption.ECOSCORE: 'Ecoscore',
     SortOption.NUTRISCORE: 'Nutriscore',
   };
+  bool isLoadingLong = false;
+  Timer? loadingTimer;
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
@@ -174,6 +174,10 @@ class _MyHomePageState extends State<MyHomePage> {
   );
 
   Future<SearchResult> searchProducts(String query) async {
+    setState(() {
+      isLoadingLong = false;
+    });
+
     List<Parameter> parameters = <Parameter>[
       SearchTerms(terms: [query]),
       const PageSize(size: 20),
@@ -296,11 +300,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                       },
                       decoration: const InputDecoration(
-                        labelText: "Search",
+                        // labelText: "Search",
                         hintText: "Search for products",
                         prefixIcon: Icon(Icons.search),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                          borderRadius: BorderRadius.all(Radius.circular(7.0)),
                         ),
                       ),
                     ),
@@ -318,7 +322,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.black,
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       // set spacing between the elements
 
                       children: [
@@ -343,8 +347,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           },
                           child: Row(
                             children: [
-                              Icon(Icons.filter_list),
-                              SizedBox(width: 8),
+                              const Icon(Icons.filter_list),
+                              // const SizedBox(width: 8),
                               Text(
                                 'Filters (${dropdownValue.values.where((v) => v).length})',
                                 style: const TextStyle(
@@ -362,25 +366,40 @@ class _MyHomePageState extends State<MyHomePage> {
                         Row(
                           children: [
                             Text('Sort by: '),
-                            DropdownButton<SortOption>(
-                              value: currentSortOption,
-                              icon: const Icon(Icons.arrow_downward),
-                              onChanged: (SortOption? newValue) {
-                                setState(() {
-                                  currentSortOption = newValue!;
-                                  searchResult = searchProducts(searchQuery);
-                                });
-                              },
-                              items: SortOption.values
-                                  .map<DropdownMenuItem<SortOption>>(
-                                      (SortOption value) {
-                                return DropdownMenuItem<SortOption>(
-                                  value: value,
-                                  child: Text(sortOptionText[value]!,
-                                      style:
-                                          const TextStyle(fontFamily: 'Poly')),
-                                );
-                              }).toList(),
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton<SortOption>(
+                                value: currentSortOption,
+                                icon: const Icon(Icons.arrow_downward),
+                                onChanged: (SortOption? newValue) {
+                                  setState(() {
+                                    currentSortOption = newValue!;
+                                    searchResult = searchProducts(searchQuery);
+                                  });
+                                },
+                                items: [
+                                  DropdownMenuItem<SortOption>(
+                                    value: SortOption.POPULARITY,
+                                    child: Text(
+                                        sortOptionText[SortOption.POPULARITY]!,
+                                        style: const TextStyle(
+                                            fontFamily: 'Poly')),
+                                  ),
+                                  DropdownMenuItem<SortOption>(
+                                    value: SortOption.ECOSCORE,
+                                    child: Text(
+                                        sortOptionText[SortOption.ECOSCORE]!,
+                                        style: const TextStyle(
+                                            fontFamily: 'Poly')),
+                                  ),
+                                  DropdownMenuItem<SortOption>(
+                                    value: SortOption.NUTRISCORE,
+                                    child: Text(
+                                        sortOptionText[SortOption.NUTRISCORE]!,
+                                        style: const TextStyle(
+                                            fontFamily: 'Poly')),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -396,13 +415,31 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.black,
                     ),
                   ),
+                  const SizedBox(
+                    height: 12,
+                  ),
                   FutureBuilder<SearchResult>(
                     future: searchResult,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        loadingTimer
+                            ?.cancel(); // cancel the previous timer if it exists
+                        loadingTimer = Timer(Duration(seconds: 10), () {
+                          setState(() {
+                            isLoadingLong = true;
+                          });
+                        });
+                        return Column(
+                          children: [
+                            const CircularProgressIndicator(),
+                            if (isLoadingLong)
+                              Text(
+                                  'This is taking longer than expected, please wait.'),
+                          ],
+                        );
                       } else if (snapshot.hasData &&
                           snapshot.data!.products != null) {
+                        loadingTimer?.cancel();
                         return Expanded(
                           child: CupertinoScrollbar(
                             child: ListView.builder(
