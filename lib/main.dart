@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 const Color mainColor = Color.fromARGB(255, 245, 245, 245);
+const Color accentColor = Color(0xFF262626);
 
 void main() {
   OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Provenance');
@@ -433,8 +434,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         return Column(
                           children: [
                             const SpinKitSpinningLines(
-                              color: Color(0xFF262626),
-                              size: 50.0,
+                              color: accentColor,
+                              size: 40.0,
+                              lineWidth: 10.0,
                             ),
                             if (isLoadingLong)
                               Text(
