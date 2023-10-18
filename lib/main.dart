@@ -202,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final SpinKitSpinningLines spinny = const SpinKitSpinningLines(
     color: accentColor,
     size: 40.0,
-    lineWidth: 7.0,
+    lineWidth: 2.0,
   );
   ScrollController scrollController = ScrollController();
   String errorMessage =
@@ -211,6 +211,13 @@ class _MyHomePageState extends State<MyHomePage> {
     formats: [BarcodeFormat.ean13, BarcodeFormat.upcA],
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
+
+  void clearSearch() {
+    setState(() {
+      searchQuery = '';
+      searchResult = null;
+    });
+  }
 
   Future<SearchResult> searchProducts(String query) async {
     setState(() {
