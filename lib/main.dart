@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 const Color mainColor = Color.fromARGB(255, 245, 245, 245);
 
@@ -431,7 +432,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                         return Column(
                           children: [
-                            const CircularProgressIndicator(),
+                            const SpinKitSpinningLines(
+                              color: Color(0xFF262626),
+                              size: 50.0,
+                            ),
                             if (isLoadingLong)
                               Text(
                                   'This is taking longer than expected, please wait.'),
