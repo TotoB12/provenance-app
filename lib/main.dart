@@ -84,24 +84,45 @@ class ProductCard extends StatelessWidget {
                             if (product.nutriscore != null &&
                                 product.nutriscore != 'not-applicable')
                               Expanded(
-                                  child: SvgPicture.asset(
-                                      'assets/images/nutriscore-${product.nutriscore}.svg',
-                                      height: 50)),
+                                child: SvgPicture.asset(
+                                    'assets/images/nutriscore-${product.nutriscore}.svg',
+                                    height: 50),
+                              )
+                            else
+                              Expanded(
+                                child: SvgPicture.asset(
+                                    'assets/images/nutriscore-unknown.svg',
+                                    height: 50),
+                              ),
                             const SizedBox(width: 10),
                             if (product.ecoscoreGrade != null &&
                                 product.ecoscoreGrade != 'not-applicable' &&
                                 product.ecoscoreGrade != 'unknown')
                               Expanded(
-                                  child: SvgPicture.asset(
-                                      'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
-                                      height: 50)),
+                                child: SvgPicture.asset(
+                                    'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
+                                    height: 50),
+                              )
+                            else
+                              Expanded(
+                                child: SvgPicture.asset(
+                                    'assets/images/ecoscore-unknown.svg',
+                                    height: 50),
+                              ),
                             const SizedBox(width: 10),
                             if (product.novaGroup != null &&
                                 product.novaGroup != 'not-applicable')
                               Expanded(
-                                  child: SvgPicture.asset(
-                                      'assets/images/nova-group-${product.novaGroup}.svg',
-                                      height: 50)),
+                                child: SvgPicture.asset(
+                                    'assets/images/nova-group-${product.novaGroup}.svg',
+                                    height: 50),
+                              )
+                            else
+                              Expanded(
+                                child: SvgPicture.asset(
+                                    'assets/images/nova-group-unknown.svg',
+                                    height: 50),
+                              ),
                           ],
                         ),
                       ),
@@ -173,6 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
     size: 40.0,
     lineWidth: 10.0,
   );
+  ScrollController scrollController = ScrollController();
   String errorMessage =
       'Please try again. Sorry, but either this product is not in the database, or the scan was unsuccessful.';
   MobileScannerController cameraController = MobileScannerController(
@@ -446,10 +468,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       } else if (snapshot.hasData &&
                           snapshot.data!.products != null) {
-                        loadingTimer?.cancel();
                         return Expanded(
                           child: CupertinoScrollbar(
+                            controller: scrollController,
                             child: ListView.builder(
+                              controller: scrollController,
                               itemCount: snapshot.data!.products!.length,
                               itemBuilder: (context, index) {
                                 Product product =
@@ -614,8 +637,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                   AsyncSnapshot<Product> snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
+                                  return Center(
+                                    child: spinny,
+                                  );
                                 } else {
                                   // if (snapshot.hasData) {
                                   return CupertinoScrollbar(
@@ -924,7 +948,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     key: ValueKey(historyVersion),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return Center(child: spinny);
                       } else {
                         if (snapshot.data!.isEmpty) {
                           return Center(
