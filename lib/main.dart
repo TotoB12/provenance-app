@@ -467,9 +467,37 @@ class _MyHomePageState extends State<MyHomePage> {
                   FutureBuilder<SearchResult>(
                     future: searchResult,
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                      if (searchQuery.isEmpty) {
+                        // Check if search bar is empty
+                        return Expanded(
+                          // Add this
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.manage_search,
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.15,
+                                  color: Colors.black,
+                                ),
+                                const Text(
+                                  'Search for\nany product.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'Poly',
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      } else if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
                         loadingTimer?.cancel();
-                        loadingTimer = Timer(Duration(seconds: 10), () {
+                        loadingTimer = Timer(const Duration(seconds: 10), () {
                           setState(() {
                             isLoadingLong = true;
                           });
@@ -481,11 +509,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             spinny,
                             if (isLoadingLong)
-                              const SizedBox(
-                                height: 20,
-                              ),
-                            const Text(
-                                'This is taking longer than expected, please be patient.'),
+                              const Text(
+                                  'This is taking longer than expected, please be patient.'),
                           ],
                         );
                       } else if (snapshot.hasData &&
@@ -545,7 +570,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Container(
                         decoration: const BoxDecoration(
                           color: mainColor,
-                          shape: BoxShape.circle,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.all(Radius.circular(7.0)),
                         ),
                         child: IconButton(
                           icon: const Icon(Icons.flip_camera_ios),
@@ -567,7 +593,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Container(
                         decoration: const BoxDecoration(
                           color: mainColor,
-                          shape: BoxShape.circle,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.all(Radius.circular(7.0)),
                         ),
                         child: IconButton(
                           icon: const Icon(Icons.input),
@@ -590,7 +617,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           : Container(
                               decoration: BoxDecoration(
                                 color: isFlashOn ? Colors.yellow : mainColor,
-                                shape: BoxShape.circle,
+                                shape: BoxShape.rectangle,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(7.0)),
                               ),
                               child: IconButton(
                                 icon: const Icon(Icons.flash_on),
@@ -637,12 +666,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                   Icon(
                                     Icons.camera_enhance,
                                     size: MediaQuery.of(context).size.height *
-                                        0.15, // 20% of screen height
-                                    color:
-                                        Colors.black, // Set the color as needed
+                                        0.15,
+                                    color: Colors.black,
                                   ),
                                   const Text(
-                                    'Scan product to\n get started.',
+                                    'Scan product to\nget started.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 22,
