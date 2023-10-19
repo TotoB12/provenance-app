@@ -44,7 +44,7 @@ class ProductCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Card(
-            color: const Color.fromARGB(255, 245, 245, 245),
+            color: mainColor,
             elevation: 0.0,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -468,9 +468,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     future: searchResult,
                     builder: (context, snapshot) {
                       if (searchQuery.isEmpty) {
-                        // Check if search bar is empty
                         return Expanded(
-                          // Add this
                           child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -727,6 +725,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ],
                                           ),
                                           Card(
+                                            color: mainColor,
+                                            elevation: 0.0,
                                             child: ListTile(
                                               leading: Padding(
                                                 padding:
@@ -764,6 +764,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                               snapshot.data!.nutriscore !=
                                                   'not-applicable')
                                             Card(
+                                              color: mainColor,
+                                              elevation: 0.0,
                                               child: ListTile(
                                                 leading: Padding(
                                                   padding:
@@ -794,6 +796,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   ?.isNotEmpty ??
                                               false)
                                             Card(
+                                              color: mainColor,
+                                              elevation: 0.0,
                                               child: ExpansionTile(
                                                 title: Text(
                                                   '${(snapshot.data!.ingredientsText ?? '').split(',').length} ingredient${(snapshot.data!.ingredientsText ?? '').split(',').length > 1 ? 's' : ''}',
@@ -836,6 +840,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                               snapshot.data!.ecoscoreGrade !=
                                                   'unknown')
                                             Card(
+                                              color: mainColor,
+                                              elevation: 0.0,
                                               child: ListTile(
                                                 leading: Padding(
                                                   padding:
@@ -867,6 +873,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                               snapshot.data!.novaGroup !=
                                                   'not-applicable')
                                             Card(
+                                              color: mainColor,
+                                              elevation: 0.0,
                                               child: ListTile(
                                                 leading: Padding(
                                                   padding:
