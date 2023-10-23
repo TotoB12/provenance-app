@@ -538,160 +538,164 @@ class _MyHomePageState extends State<MyHomePage> {
           ), // Search page
           Visibility(
             visible: _selectedIndex == 1,
-            child: Column(
-              children: <Widget>[
-                Stack(
-                  children: <Widget>[
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: MobileScanner(
-                        controller: cameraController,
-                        onDetect: (capture) async {
-                          final List<Barcode> barcodes = capture.barcodes;
-                          for (final barcode in barcodes) {
-                            if (barcode.rawValue != this.barcode) {
+            child: Container(
+              color: mainColor,
+              child: Column(
+                children: <Widget>[
+                  Stack(
+                    children: <Widget>[
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        child: MobileScanner(
+                          controller: cameraController,
+                          onDetect: (capture) async {
+                            final List<Barcode> barcodes = capture.barcodes;
+                            for (final barcode in barcodes) {
+                              if (barcode.rawValue != this.barcode) {
+                                setState(() {
+                                  this.barcode = barcode.rawValue ?? '';
+                                  isError = false; // Reset the error flag
+                                  productFuture = getProductInfo(this.barcode);
+                                  isWelcomeScreen = false;
+                                });
+                                HapticFeedback.heavyImpact();
+                              }
+                            }
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10.0,
+                        left: 10.0,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: mainColor,
+                            shape: BoxShape.rectangle,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(7.0)),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.flip_camera_ios),
+                            onPressed: () {
+                              cameraController.switchCamera();
+                              HapticFeedback.lightImpact();
                               setState(() {
-                                this.barcode = barcode.rawValue ?? '';
-                                isError = false; // Reset the error flag
+                                isFlashOn = false;
+                                isCameraFlipped = !isCameraFlipped;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10.0,
+                        left: MediaQuery.of(context).size.width / 2 -
+                            20, // Center the button
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: mainColor,
+                            shape: BoxShape.rectangle,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(7.0)),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.input),
+                            onPressed: () {
+                              setState(() {
+                                this.barcode = '8000500037560';
                                 productFuture = getProductInfo(this.barcode);
                                 isWelcomeScreen = false;
                               });
                               HapticFeedback.heavyImpact();
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 10.0,
-                      left: 10.0,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: mainColor,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(Radius.circular(7.0)),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.flip_camera_ios),
-                          onPressed: () {
-                            cameraController.switchCamera();
-                            HapticFeedback.lightImpact();
-                            setState(() {
-                              isFlashOn = false;
-                              isCameraFlipped = !isCameraFlipped;
-                            });
-                          },
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      bottom: 10.0,
-                      left: MediaQuery.of(context).size.width / 2 -
-                          20, // Center the button
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: mainColor,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(Radius.circular(7.0)),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.input),
-                          onPressed: () {
-                            setState(() {
-                              this.barcode = '8000500037560';
-                              productFuture = getProductInfo(this.barcode);
-                              isWelcomeScreen = false;
-                            });
-                            HapticFeedback.heavyImpact();
-                          },
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 10.0,
-                      right: 10.0,
-                      child: isCameraFlipped
-                          ? Container()
-                          : Container(
-                              decoration: BoxDecoration(
-                                color: isFlashOn ? Colors.yellow : mainColor,
-                                shape: BoxShape.rectangle,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(7.0)),
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.flash_on),
-                                onPressed: () {
-                                  cameraController.toggleTorch();
-                                  HapticFeedback.lightImpact();
-                                  setState(() {
-                                    isFlashOn = !isFlashOn;
-                                  });
-                                },
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: isError
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Icon(
-                                Icons.network_check,
-                                size: MediaQuery.of(context).size.height * 0.15,
-                                color: Colors.red,
-                              ),
-                              const Text(
-                                'There has been an error,\nplease try again.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontFamily: 'Poly',
-                                  fontWeight: FontWeight.w700,
+                      Positioned(
+                        bottom: 10.0,
+                        right: 10.0,
+                        child: isCameraFlipped
+                            ? Container()
+                            : Container(
+                                decoration: BoxDecoration(
+                                  color: isFlashOn ? Colors.yellow : mainColor,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(7.0)),
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(Icons.flash_on),
+                                  onPressed: () {
+                                    cameraController.toggleTorch();
+                                    HapticFeedback.lightImpact();
+                                    setState(() {
+                                      isFlashOn = !isFlashOn;
+                                    });
+                                  },
                                 ),
                               ),
-                            ],
-                          ),
-                        )
-                      : isWelcomeScreen
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.camera_enhance,
-                                    size: MediaQuery.of(context).size.height *
-                                        0.15,
-                                    color: Colors.black,
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: isError
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.network_check,
+                                  size:
+                                      MediaQuery.of(context).size.height * 0.15,
+                                  color: Colors.red,
+                                ),
+                                const Text(
+                                  'There has been an error,\nplease try again.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'Poly',
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                  const Text(
-                                    'Scan product to\nget started.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontFamily: 'Poly',
-                                      fontWeight: FontWeight.w700,
+                                ),
+                              ],
+                            ),
+                          )
+                        : isWelcomeScreen
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.camera_enhance,
+                                      size: MediaQuery.of(context).size.height *
+                                          0.15,
+                                      color: Colors.black,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : FutureBuilder<Product>(
-                              future: productFuture,
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<Product> snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                    child: spinny,
-                                  );
-                                } else {
-                                  // if (snapshot.hasData) {
-                                  return CupertinoScrollbar(
-                                    child: SingleChildScrollView(
+                                    const Text(
+                                      'Scan product to\nget started.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontFamily: 'Poly',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : FutureBuilder<Product>(
+                                future: productFuture,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<Product> snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child: spinny,
+                                    );
+                                  } else {
+                                    // if (snapshot.hasData) {
+                                    return SingleChildScrollView(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Column(
                                         crossAxisAlignment:
@@ -705,7 +709,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 child: Text(
                                                   '${snapshot.data?.productName ?? 'Unknown Product'}',
                                                   style: const TextStyle(
-                                                    fontSize: 24,
+                                                    fontSize: 32,
                                                     fontFamily: 'Poly',
                                                     fontWeight: FontWeight.w700,
                                                   ),
@@ -903,16 +907,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ),
                                         ],
                                       ),
-                                    ),
-                                  );
-                                  // } else {
-                                  //   return Text(errorMessage);
-                                  // }
-                                }
-                              },
-                            ),
-                ),
-              ],
+                                    );
+                                    // } else {
+                                    //   return Text(errorMessage);
+                                    // }
+                                  }
+                                },
+                              ),
+                  ),
+                ],
+              ),
             ),
           ), // Scan page
           Container(
