@@ -34,11 +34,9 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
+        Navigator.of(context).push(
           CupertinoPageRoute(
             builder: (context) => ProductPage(),
-            fullscreenDialog: true,
           ),
         );
       },
@@ -160,9 +158,9 @@ class ProductCard extends StatelessWidget {
 
 // class ProductPage extends StatelessWidget {
 //   final Product product;
-
+//
 //   ProductPage({required this.product});
-
+//
 //   @override
 //   Widget build(BuildContext context) {
 //     return SingleChildScrollView(
@@ -347,9 +345,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Provenance',
       theme: ThemeData(
-        primaryColor: const Color(0xFF262626), // RGB(38, 38, 38)
-        colorScheme:
-            ThemeData().colorScheme.copyWith(primary: const Color(0xFF262626)),
+        primaryColor: accentColor, // RGB(38, 38, 38)
+        colorScheme: ThemeData().colorScheme.copyWith(primary: accentColor),
       ),
       home: const MyHomePage(title: 'Provenance'),
     );
@@ -359,9 +356,23 @@ class MyApp extends StatelessWidget {
 class ProductPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Test'),
+    return CupertinoPageScaffold(
+      child: CustomScrollView(
+        slivers: <Widget>[
+          const CupertinoSliverNavigationBar(
+            largeTitle: Text('Product Page'),
+            automaticallyImplyLeading: true,
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text('Test ${index + 1}'),
+              ),
+              childCount: 20,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -385,7 +396,7 @@ class _MyHomePageState extends State<MyHomePage>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
     );
   }
 
@@ -633,7 +644,7 @@ class _MyHomePageState extends State<MyHomePage>
                         //   child:
                         Row(
                           children: [
-                            Text('Sort by: '),
+                            const Text('Sort by: '),
                             DropdownButtonHideUnderline(
                               child: DropdownButton<SortOption>(
                                 value: currentSortOption,
@@ -730,7 +741,7 @@ class _MyHomePageState extends State<MyHomePage>
                             spinny,
                             if (isLoadingLong)
                               const Text(
-                                  'This is taking longer than expected, please be patient.'),
+                                  'This is taking longer than expected,\nplease be patient.'),
                           ],
                         );
                       } else if (snapshot.hasData &&
@@ -764,102 +775,107 @@ class _MyHomePageState extends State<MyHomePage>
               color: mainColor,
               child: Column(
                 children: <Widget>[
-                  Stack(
-                    children: <Widget>[
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.62,
-                        child: MobileScanner(
-                          controller: cameraController,
-                          onDetect: (capture) async {
-                            final List<Barcode> barcodes = capture.barcodes;
-                            for (final barcode in barcodes) {
-                              if (barcode.rawValue != this.barcode) {
+                  Flexible(
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.62,
+                          child: MobileScanner(
+                            controller: cameraController,
+                            onDetect: (capture) async {
+                              final List<Barcode> barcodes = capture.barcodes;
+                              for (final barcode in barcodes) {
+                                if (barcode.rawValue != this.barcode) {
+                                  setState(() {
+                                    this.barcode = barcode.rawValue ?? '';
+                                    isError = false; // Reset the error flag
+                                    productFuture =
+                                        getProductInfo(this.barcode);
+                                    isWelcomeScreen = false;
+                                  });
+                                  HapticFeedback.heavyImpact();
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          top: 10.0,
+                          left: 10.0,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: mainColor,
+                              shape: BoxShape.rectangle,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(7.0)),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.flip_camera_ios),
+                              onPressed: () {
+                                cameraController.switchCamera();
+                                HapticFeedback.lightImpact();
                                 setState(() {
-                                  this.barcode = barcode.rawValue ?? '';
-                                  isError = false; // Reset the error flag
+                                  isFlashOn = false;
+                                  isCameraFlipped = !isCameraFlipped;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 10.0,
+                          left: MediaQuery.of(context).size.width / 2 -
+                              20, // Center the button
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: mainColor,
+                              shape: BoxShape.rectangle,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(7.0)),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.input),
+                              onPressed: () {
+                                setState(() {
+                                  this.barcode = '8000500037560';
                                   productFuture = getProductInfo(this.barcode);
                                   isWelcomeScreen = false;
                                 });
                                 HapticFeedback.heavyImpact();
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                      Positioned(
-                        top: 10.0,
-                        left: 10.0,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: mainColor,
-                            shape: BoxShape.rectangle,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(7.0)),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.flip_camera_ios),
-                            onPressed: () {
-                              cameraController.switchCamera();
-                              HapticFeedback.lightImpact();
-                              setState(() {
-                                isFlashOn = false;
-                                isCameraFlipped = !isCameraFlipped;
-                              });
-                            },
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        top: 10.0,
-                        left: MediaQuery.of(context).size.width / 2 -
-                            20, // Center the button
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: mainColor,
-                            shape: BoxShape.rectangle,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(7.0)),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.input),
-                            onPressed: () {
-                              setState(() {
-                                this.barcode = '8000500037560';
-                                productFuture = getProductInfo(this.barcode);
-                                isWelcomeScreen = false;
-                              });
-                              HapticFeedback.heavyImpact();
-                            },
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 10.0,
-                        right: 10.0,
-                        child: isCameraFlipped
-                            ? Container()
-                            : Container(
-                                decoration: BoxDecoration(
-                                  color: isFlashOn ? Colors.yellow : mainColor,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(7.0)),
+                        Positioned(
+                          top: 10.0,
+                          right: 10.0,
+                          child: isCameraFlipped
+                              ? Container()
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    color:
+                                        isFlashOn ? Colors.yellow : mainColor,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7.0)),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.flash_on),
+                                    onPressed: () {
+                                      cameraController.toggleTorch();
+                                      HapticFeedback.lightImpact();
+                                      setState(() {
+                                        isFlashOn = !isFlashOn;
+                                      });
+                                    },
+                                  ),
                                 ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.flash_on),
-                                  onPressed: () {
-                                    cameraController.toggleTorch();
-                                    HapticFeedback.lightImpact();
-                                    setState(() {
-                                      isFlashOn = !isFlashOn;
-                                    });
-                                  },
-                                ),
-                              ),
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
-                  Expanded(
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 300),
                     child: isError
                         ? Center(
                             child: Column(
@@ -888,19 +904,27 @@ class _MyHomePageState extends State<MyHomePage>
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    Icon(
-                                      Icons.camera_enhance,
-                                      size: MediaQuery.of(context).size.height *
-                                          0.15,
-                                      color: Colors.black,
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 20.0),
+                                      child: Icon(
+                                        Icons.camera_enhance,
+                                        size:
+                                            MediaQuery.of(context).size.height *
+                                                0.15,
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                    const Text(
-                                      'Scan product to\nget started.',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontFamily: 'Poly',
-                                        fontWeight: FontWeight.w700,
+                                    const Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 10.0, bottom: 20.0),
+                                      child: Text(
+                                        'Scan product to\nget started.',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontFamily: 'Poly',
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -912,8 +936,11 @@ class _MyHomePageState extends State<MyHomePage>
                                     AsyncSnapshot<Product> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                    return Center(
-                                      child: spinny,
+                                    return Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.2,
+                                      child: Center(child: spinny),
                                     );
                                   } else {
                                     // if (snapshot.hasData) {
