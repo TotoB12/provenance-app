@@ -32,121 +32,314 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Center(
-          child: Container(
-            height: 0.4,
-            width: MediaQuery.of(context).size.width * 0.9,
-            color: Colors.black,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          CupertinoPageRoute(
+            builder: (context) => ProductPage(),
+            fullscreenDialog: true,
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Card(
-            color: mainColor,
-            elevation: 0.0,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                if (product.imageFrontSmallUrl != null)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      height: MediaQuery.of(context).size.width * 0.2,
-                      child: Image.network(product.imageFrontUrl!,
-                          fit: BoxFit.contain),
-                    ),
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      height: MediaQuery.of(context).size.width * 0.2,
-                      child: Icon(Icons.shopping_cart,
-                          size: 50), // Replace with your own icon
-                    ),
-                  ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ListTile(
-                        title: Text(
-                          '${product.productName ?? 'Unknown Product'}',
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontFamily: 'Poly',
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            if (product.nutriscore != null &&
-                                product.nutriscore != 'not-applicable')
-                              // Expanded(
-                              SvgPicture.asset(
-                                  'assets/images/nutriscore-${product.nutriscore}.svg',
-                                  height: 50)
-                            // )
-                            else
-                              // Expanded(
-                              SvgPicture.asset(
-                                  'assets/images/nutriscore-unknown.svg',
-                                  height: 50),
-                            // ),
-                            const SizedBox(width: 10),
-                            if (product.ecoscoreGrade != null &&
-                                product.ecoscoreGrade != 'not-applicable' &&
-                                product.ecoscoreGrade != 'unknown')
-                              // Expanded(
-                              SvgPicture.asset(
-                                  'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
-                                  height: 50)
-                            // )
-                            else
-                              // Expanded(
-                              SvgPicture.asset(
-                                  'assets/images/ecoscore-unknown.svg',
-                                  height: 50),
-                            // ),
-                            const SizedBox(width: 10),
-                            if (product.novaGroup != null &&
-                                product.novaGroup != 'not-applicable')
-                              // Expanded(
-                              SvgPicture.asset(
-                                  'assets/images/nova-group-${product.novaGroup}.svg',
-                                  height: 50)
-                            // )
-                            else
-                              // Expanded(
-                              SvgPicture.asset(
-                                  'assets/images/nova-group-unknown.svg',
-                                  height: 50)
-                            // ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+        );
+      },
+      child: Column(
+        children: <Widget>[
+          Center(
+            child: Container(
+              height: 0.4,
+              width: MediaQuery.of(context).size.width * 0.9,
+              color: Colors.black,
             ),
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              color: mainColor,
+              elevation: 0.0,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  if (product.imageFrontSmallUrl != null)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.2,
+                        height: MediaQuery.of(context).size.width * 0.2,
+                        child: Image.network(product.imageFrontUrl!,
+                            fit: BoxFit.contain),
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.2,
+                        height: MediaQuery.of(context).size.width * 0.2,
+                        child: Icon(Icons.shopping_cart, size: 50),
+                      ),
+                    ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        ListTile(
+                          title: Text(
+                            '${product.productName ?? 'Unknown Product'}',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontFamily: 'Poly',
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              if (product.nutriscore != null &&
+                                  product.nutriscore != 'not-applicable')
+                                // Expanded(
+                                SvgPicture.asset(
+                                    'assets/images/nutriscore-${product.nutriscore}.svg',
+                                    height: 50)
+                              // )
+                              else
+                                // Expanded(
+                                SvgPicture.asset(
+                                    'assets/images/nutriscore-unknown.svg',
+                                    height: 50),
+                              // ),
+                              const SizedBox(width: 10),
+                              if (product.ecoscoreGrade != null &&
+                                  product.ecoscoreGrade != 'not-applicable' &&
+                                  product.ecoscoreGrade != 'unknown')
+                                // Expanded(
+                                SvgPicture.asset(
+                                    'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
+                                    height: 50)
+                              // )
+                              else
+                                // Expanded(
+                                SvgPicture.asset(
+                                    'assets/images/ecoscore-unknown.svg',
+                                    height: 50),
+                              // ),
+                              const SizedBox(width: 10),
+                              if (product.novaGroup != null &&
+                                  product.novaGroup != 'not-applicable')
+                                // Expanded(
+                                SvgPicture.asset(
+                                    'assets/images/nova-group-${product.novaGroup}.svg',
+                                    height: 50)
+                              // )
+                              else
+                                // Expanded(
+                                SvgPicture.asset(
+                                    'assets/images/nova-group-unknown.svg',
+                                    height: 50)
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
+
+// class ProductPage extends StatelessWidget {
+//   final Product product;
+
+//   ProductPage({required this.product});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//       padding: const EdgeInsets.all(16.0),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: <Widget>[
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: <Widget>[
+//               Expanded(
+//                 child: Text(
+//                   '${snapshot.data?.productName ?? 'Unknown Product'}',
+//                   style: const TextStyle(
+//                     fontSize: 32,
+//                     fontFamily: 'Poly',
+//                     fontWeight: FontWeight.w700,
+//                   ),
+//                   maxLines: 2,
+//                   overflow: TextOverflow.ellipsis,
+//                 ),
+//               ),
+//               IconButton(
+//                 icon: const Icon(Icons.close),
+//                 onPressed: () {
+//                   setState(() {
+//                     isWelcomeScreen = true;
+//                   });
+//                 },
+//               ),
+//             ],
+//           ),
+//           Card(
+//             color: mainColor,
+//             elevation: 0.0,
+//             child: ListTile(
+//               leading: Padding(
+//                 padding: const EdgeInsets.all(8.0),
+//                 child: Container(
+//                   width: MediaQuery.of(context).size.width * 0.2,
+//                   child: snapshot.data?.imageFrontSmallUrl != null
+//                       ? Image.network(
+//                           snapshot.data!.imageFrontUrl!,
+//                           fit: BoxFit.scaleDown,
+//                         )
+//                       : const Icon(Icons.shopping_cart, size: 24.0),
+//                 ),
+//               ),
+//               title: Text(
+//                 '${snapshot.data?.brands ?? 'Unknown'}, ${snapshot.data?.quantity ?? 'Unknown quantity'}',
+//                 style: const TextStyle(
+//                   fontSize: 20,
+//                   fontFamily: 'Poly',
+//                   fontWeight: FontWeight.w500,
+//                 ),
+//               ),
+//             ),
+//           ),
+//           if (snapshot.data?.nutriscore != null &&
+//               snapshot.data!.nutriscore != 'not-applicable')
+//             Card(
+//               color: mainColor,
+//               elevation: 0.0,
+//               child: ListTile(
+//                 leading: Padding(
+//                   padding: const EdgeInsets.all(8.0),
+//                   child: Container(
+//                     width: MediaQuery.of(context).size.width * 0.2,
+//                     child: SvgPicture.asset(
+//                       'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
+//                       fit: BoxFit.scaleDown,
+//                     ),
+//                   ),
+//                 ),
+//                 title: Text(
+//                   '${getNutriScoreMessage(snapshot.data?.nutriscore ?? 'Unknown')}',
+//                   style: const TextStyle(
+//                     fontSize: 20,
+//                     fontFamily: 'Poly',
+//                     fontWeight: FontWeight.w500,
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           if (snapshot.data?.ingredientsText?.isNotEmpty ?? false)
+//             Card(
+//               color: mainColor,
+//               elevation: 0.0,
+//               child: ExpansionTile(
+//                 title: Text(
+//                   '${(snapshot.data!.ingredientsText ?? '').split(',').length} ingredient${(snapshot.data!.ingredientsText ?? '').split(',').length > 1 ? 's' : ''}',
+//                   style: const TextStyle(
+//                     fontSize: 20,
+//                     fontFamily: 'Poly',
+//                     fontWeight: FontWeight.w500,
+//                   ),
+//                   maxLines: 2,
+//                   overflow: TextOverflow.ellipsis,
+//                 ),
+//                 leading: const Icon(Icons.list),
+//                 collapsedTextColor: Colors
+//                     .black, // Color of the title text when the tile is collapsed
+//                 textColor: Colors
+//                     .blue, // Color of the title text when the tile is expanded
+//                 children: [
+//                   Padding(
+//                     padding: const EdgeInsets.all(8.0),
+//                     child: Text(
+//                       '${snapshot.data?.ingredients}',
+//                       style: const TextStyle(
+//                         fontSize: 16,
+//                         fontFamily: 'Poly',
+//                         fontWeight: FontWeight.w400,
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           if (snapshot.data?.ecoscoreGrade != null &&
+//               snapshot.data!.ecoscoreGrade != 'not-applicable' &&
+//               snapshot.data!.ecoscoreGrade != 'unknown')
+//             Card(
+//               color: mainColor,
+//               elevation: 0.0,
+//               child: ListTile(
+//                 leading: Padding(
+//                   padding: const EdgeInsets.all(8.0),
+//                   child: Container(
+//                     width: MediaQuery.of(context).size.width * 0.2,
+//                     child: SvgPicture.asset(
+//                       'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
+//                       fit: BoxFit.scaleDown,
+//                     ),
+//                   ),
+//                 ),
+//                 title: Text(
+//                   '${getEcoScoreMessage(snapshot.data?.ecoscoreGrade ?? 'Unknown')}',
+//                   style: const TextStyle(
+//                     fontSize: 20,
+//                     fontFamily: 'Poly',
+//                     fontWeight: FontWeight.w500,
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           if (snapshot.data?.novaGroup != null &&
+//               snapshot.data!.novaGroup != 'not-applicable')
+//             Card(
+//               color: mainColor,
+//               elevation: 0.0,
+//               child: ListTile(
+//                 leading: Padding(
+//                   padding: const EdgeInsets.all(8.0),
+//                   child: Container(
+//                     width: MediaQuery.of(context).size.width * 0.1,
+//                     child: SvgPicture.asset(
+//                       'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
+//                       fit: BoxFit.scaleDown,
+//                     ),
+//                   ),
+//                 ),
+//                 title: Text(
+//                   '${getNovaGroupMessage(snapshot.data?.novaGroup.toString() ?? 'Unknown')}',
+//                   style: const TextStyle(
+//                     fontSize: 20,
+//                     fontFamily: 'Poly',
+//                     fontWeight: FontWeight.w500,
+//                   ),
+//                 ),
+//               ),
+//             ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class MyApp extends StatelessWidget {
   @override
@@ -163,6 +356,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class ProductPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text('Test'),
+      ),
+    );
+  }
+}
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
 
@@ -172,7 +376,25 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   String barcode = '';
   Future<Product>? productFuture;
   int _selectedIndex = 1;
@@ -545,7 +767,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Stack(
                     children: <Widget>[
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.3,
+                        height: MediaQuery.of(context).size.height * 0.62,
                         child: MobileScanner(
                           controller: cameraController,
                           onDetect: (capture) async {
@@ -565,7 +787,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Positioned(
-                        bottom: 10.0,
+                        top: 10.0,
                         left: 10.0,
                         child: Container(
                           decoration: const BoxDecoration(
@@ -588,7 +810,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Positioned(
-                        bottom: 10.0,
+                        top: 10.0,
                         left: MediaQuery.of(context).size.width / 2 -
                             20, // Center the button
                         child: Container(
@@ -612,7 +834,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Positioned(
-                        bottom: 10.0,
+                        top: 10.0,
                         right: 10.0,
                         child: isCameraFlipped
                             ? Container()
@@ -696,215 +918,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   } else {
                                     // if (snapshot.hasData) {
                                     return SingleChildScrollView(
-                                      padding: const EdgeInsets.all(16.0),
+                                      // padding: const EdgeInsets.all(16.0),
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              Expanded(
-                                                child: Text(
-                                                  '${snapshot.data?.productName ?? 'Unknown Product'}',
-                                                  style: const TextStyle(
-                                                    fontSize: 32,
-                                                    fontFamily: 'Poly',
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(Icons.close),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    isWelcomeScreen = true;
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          Card(
-                                            color: mainColor,
-                                            elevation: 0.0,
-                                            child: ListTile(
-                                              leading: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.2,
-                                                  child: snapshot.data
-                                                              ?.imageFrontSmallUrl !=
-                                                          null
-                                                      ? Image.network(
-                                                          snapshot.data!
-                                                              .imageFrontUrl!,
-                                                          fit: BoxFit.scaleDown,
-                                                        )
-                                                      : const Icon(
-                                                          Icons.shopping_cart,
-                                                          size: 24.0),
-                                                ),
-                                              ),
-                                              title: Text(
-                                                '${snapshot.data?.brands ?? 'Unknown'}, ${snapshot.data?.quantity ?? 'Unknown quantity'}',
-                                                style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontFamily: 'Poly',
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          if (snapshot.data?.nutriscore !=
-                                                  null &&
-                                              snapshot.data!.nutriscore !=
-                                                  'not-applicable')
-                                            Card(
-                                              color: mainColor,
-                                              elevation: 0.0,
-                                              child: ListTile(
-                                                leading: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.2,
-                                                    child: SvgPicture.asset(
-                                                      'assets/images/nutriscore-${snapshot.data!.nutriscore}.svg',
-                                                      fit: BoxFit.scaleDown,
-                                                    ),
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                  '${getNutriScoreMessage(snapshot.data?.nutriscore ?? 'Unknown')}',
-                                                  style: const TextStyle(
-                                                    fontSize: 20,
-                                                    fontFamily: 'Poly',
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          if (snapshot.data?.ingredientsText
-                                                  ?.isNotEmpty ??
-                                              false)
-                                            Card(
-                                              color: mainColor,
-                                              elevation: 0.0,
-                                              child: ExpansionTile(
-                                                title: Text(
-                                                  '${(snapshot.data!.ingredientsText ?? '').split(',').length} ingredient${(snapshot.data!.ingredientsText ?? '').split(',').length > 1 ? 's' : ''}',
-                                                  style: const TextStyle(
-                                                    fontSize: 20,
-                                                    fontFamily: 'Poly',
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                                leading: const Icon(Icons.list),
-                                                collapsedTextColor: Colors
-                                                    .black, // Color of the title text when the tile is collapsed
-                                                textColor: Colors
-                                                    .blue, // Color of the title text when the tile is expanded
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                      '${snapshot.data?.ingredients}',
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontFamily: 'Poly',
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          if (snapshot.data?.ecoscoreGrade !=
-                                                  null &&
-                                              snapshot.data!.ecoscoreGrade !=
-                                                  'not-applicable' &&
-                                              snapshot.data!.ecoscoreGrade !=
-                                                  'unknown')
-                                            Card(
-                                              color: mainColor,
-                                              elevation: 0.0,
-                                              child: ListTile(
-                                                leading: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.2,
-                                                    child: SvgPicture.asset(
-                                                      'assets/images/ecoscore-${snapshot.data!.ecoscoreGrade}.svg',
-                                                      fit: BoxFit.scaleDown,
-                                                    ),
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                  '${getEcoScoreMessage(snapshot.data?.ecoscoreGrade ?? 'Unknown')}',
-                                                  style: const TextStyle(
-                                                    fontSize: 20,
-                                                    fontFamily: 'Poly',
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          if (snapshot.data?.novaGroup !=
-                                                  null &&
-                                              snapshot.data!.novaGroup !=
-                                                  'not-applicable')
-                                            Card(
-                                              color: mainColor,
-                                              elevation: 0.0,
-                                              child: ListTile(
-                                                leading: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.1,
-                                                    child: SvgPicture.asset(
-                                                      'assets/images/nova-group-${snapshot.data!.novaGroup}.svg',
-                                                      fit: BoxFit.scaleDown,
-                                                    ),
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                  '${getNovaGroupMessage(snapshot.data?.novaGroup.toString() ?? 'Unknown')}',
-                                                  style: const TextStyle(
-                                                    fontSize: 20,
-                                                    fontFamily: 'Poly',
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
+                                          ProductCard(product: snapshot.data!),
                                         ],
                                       ),
                                     );
