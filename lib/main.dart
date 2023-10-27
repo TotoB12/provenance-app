@@ -126,7 +126,7 @@ class ProductCard extends StatelessWidget {
                       child: Container(
                         width: MediaQuery.of(context).size.width * 0.2,
                         height: MediaQuery.of(context).size.width * 0.2,
-                        child: Icon(Icons.shopping_cart, size: 50),
+                        child: const Icon(Icons.shopping_cart, size: 50),
                       ),
                     ),
                   Expanded(
@@ -250,13 +250,12 @@ class ProductPage extends StatelessWidget {
               children: <Widget>[
                 Container(
                   padding: const EdgeInsets.all(8.0),
-                  constraints: BoxConstraints(
-                    maxHeight: 200.0, // Set the maximum height you desire here
+                  constraints: const BoxConstraints(
+                    maxHeight: 200.0,
                   ),
                   child: Image.network(
                     product.imageFrontUrl!,
-                    fit: BoxFit
-                        .contain, // Ensures the image is not cropped and fits within the constraints
+                    fit: BoxFit.contain,
                   ),
                 ),
                 _buildInfoCard(
@@ -341,12 +340,11 @@ class ProductPage extends StatelessWidget {
       color: mainColor,
       elevation: 0.0,
       child: Theme(
-        // Using Theme to override the divider color
         data: ThemeData(dividerColor: Colors.transparent),
         child: ExpansionTile(
           title: Text(
             '${ingredientsText.split(', ').length} ingredient${ingredientsText.split(', ').length > 1 ? 's' : ''}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontFamily: 'Poly',
               fontWeight: FontWeight.w500,
@@ -364,7 +362,7 @@ class ProductPage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 ingredientsText,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontFamily: 'Poly',
                   fontWeight: FontWeight.w400,
