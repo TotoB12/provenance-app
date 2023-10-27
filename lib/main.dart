@@ -12,6 +12,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 const Color mainColor = Color.fromARGB(255, 245, 245, 245);
 const Color accentColor = Color(0xFF262626); // RGB(38, 38, 38)
+// const String codebar = '8000500037560'; //Kinder Bueno
+const String codebar = '8002270014901'; //S. Pellegrino
 
 void main() {
   OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Provenance');
@@ -28,34 +30,34 @@ void main() {
 String getEcoScoreMessage(String grade) {
   switch (grade.toUpperCase()) {
     case 'A':
-      return 'Very good';
+      return 'Very low environmental impact';
     case 'B':
-      return 'Good';
+      return 'Low environmental impact';
     case 'C':
-      return 'Mediocre';
+      return 'Moderate environmental impact';
     case 'D':
-      return 'Bad';
+      return 'High environmental impact';
     case 'E':
-      return 'Very bad';
+      return 'Very high environmental impact';
     default:
-      return 'Unknown';
+      return 'Unknown environmental impact';
   }
 }
 
 String getNutriScoreMessage(String grade) {
   switch (grade.toUpperCase()) {
     case 'A':
-      return 'Very good';
+      return 'Very good nutritional quality';
     case 'B':
-      return 'Good';
+      return 'Good nutritional quality';
     case 'C':
-      return 'Mediocre';
+      return 'Average nutritional quality';
     case 'D':
-      return 'Bad';
+      return 'Poor nutritional quality';
     case 'E':
-      return 'Very bad';
+      return 'Bad nutritional quality';
     default:
-      return 'Unknown';
+      return 'Unknown nutritional quality';
   }
 }
 
@@ -70,7 +72,7 @@ String getNovaGroupMessage(String group) {
     case '4':
       return 'Ultra-processed product';
     default:
-      return 'Unknown';
+      return 'Food processing level unkown';
   }
 }
 
@@ -133,7 +135,7 @@ class ProductCard extends StatelessWidget {
                       children: <Widget>[
                         ListTile(
                           title: Text(
-                            '${product.productName ?? 'Unknown Product'}',
+                            product.productName ?? 'Unknown Product',
                             style: const TextStyle(
                               fontSize: 22,
                               fontFamily: 'Poly',
@@ -229,134 +231,145 @@ class ProductPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      child: Container(
-        // <- Add this container
-        color: mainColor, // <- Set the color here
-        child: CustomScrollView(
-          slivers: <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: Text(product.productName ?? 'Default Product Name'),
-              automaticallyImplyLeading: true,
+      backgroundColor: mainColor,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          CupertinoSliverNavigationBar(
+            largeTitle: Text(
+              product.productName ?? 'Default Product Name',
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poly',
+              ),
             ),
-            SliverToBoxAdapter(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                      // width: MediaQuery.of(context).size.width * 0.2,
-                      child: Image.network(
-                    product.imageFrontUrl!,
-                    fit: BoxFit.scaleDown,
-                  )),
-                  Card(
-                    color: mainColor,
-                    elevation: 0.0,
-                    child: ListTile(
-                      leading: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          child: SvgPicture.asset(
-                            'assets/images/nutriscore-${product.nutriscore}.svg',
-                            fit: BoxFit.scaleDown,
-                          ),
-                        ),
-                      ),
-                      title: Text(
-                        getNutriScoreMessage(product.nutriscore ?? 'Unknown'),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontFamily: 'Poly',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+            automaticallyImplyLeading: true,
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  constraints: BoxConstraints(
+                    maxHeight: 200.0, // Set the maximum height you desire here
                   ),
-                  if (product.ingredientsText?.isNotEmpty ?? false)
-                    Card(
-                      color: mainColor,
-                      elevation: 0.0,
-                      child: ExpansionTile(
-                        title: Text(
-                          '${(product.ingredientsText ?? '').split(',').length} ingredient${(product.ingredientsText ?? '').split(',').length > 1 ? 's' : ''}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'Poly',
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        leading: const Icon(Icons.list),
-                        collapsedTextColor: Colors
-                            .black, // Color of the title text when the tile is collapsed
-                        textColor: Colors
-                            .blue, // Color of the title text when the tile is expanded
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              '${product?.ingredients}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Poly',
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (product.ecoscoreGrade != null)
-                    Card(
-                      color: mainColor,
-                      elevation: 0.0,
-                      child: ListTile(
-                        leading: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.2,
-                            child: SvgPicture.asset(
-                              'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
-                              fit: BoxFit.scaleDown,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          '${getEcoScoreMessage(product.ecoscoreGrade ?? 'Unknown')}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'Poly',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (product.novaGroup != null)
-                    Card(
-                      color: mainColor,
-                      elevation: 0.0,
-                      child: ListTile(
-                        leading: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.1,
-                            child: SvgPicture.asset(
-                              'assets/images/nova-group-${product.novaGroup}.svg',
-                              fit: BoxFit.scaleDown,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          '${getNovaGroupMessage(product.novaGroup.toString() ?? 'Unknown')}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'Poly',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+                  child: Image.network(
+                    product.imageFrontUrl!,
+                    fit: BoxFit
+                        .contain, // Ensures the image is not cropped and fits within the constraints
+                  ),
+                ),
+                _buildInfoCard(
+                  context: context,
+                  dataValue: product.nutriscore,
+                  assetPrefix: 'nutriscore',
+                  description:
+                      getNutriScoreMessage(product.nutriscore ?? 'Unknown'),
+                ),
+                _buildInfoCard(
+                  context: context,
+                  dataValue: product.ecoscoreGrade,
+                  assetPrefix: 'ecoscore',
+                  description:
+                      getEcoScoreMessage(product.ecoscoreGrade ?? 'Unknown'),
+                ),
+                if (product.ingredientsText?.isNotEmpty ?? false)
+                  _buildIngredientsCard(product.ingredientsText!),
+                _buildInfoCard(
+                  context: context,
+                  dataValue: product.novaGroup.toString(),
+                  assetPrefix: 'nova-group',
+                  description: getNovaGroupMessage(
+                      product.novaGroup.toString() ?? 'Unknown'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required BuildContext context,
+    required String? dataValue,
+    required String assetPrefix,
+    required String description,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      color: mainColor,
+      elevation: 0.0,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width * 0.3, // 30% width
+              height: 67, // consistent height for the score images
+              padding: const EdgeInsets.all(8.0),
+              child: SvgPicture.asset(
+                dataValue != null &&
+                        dataValue != 'not-applicable' &&
+                        dataValue != 'unknown'
+                    ? 'assets/images/$assetPrefix-$dataValue.svg'
+                    : 'assets/images/$assetPrefix-unknown.svg',
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: Text(
+                description,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontFamily: 'Poly',
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIngredientsCard(String ingredientsText) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      color: mainColor,
+      elevation: 0.0,
+      child: Theme(
+        // Using Theme to override the divider color
+        data: ThemeData(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          title: Text(
+            '${ingredientsText.split(', ').length} ingredient${ingredientsText.split(', ').length > 1 ? 's' : ''}',
+            style: TextStyle(
+              fontSize: 20,
+              fontFamily: 'Poly',
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+            ),
+          ),
+          leading: const Icon(
+            Icons.list,
+            color: Colors.black,
+          ),
+          collapsedTextColor: Colors.black,
+          textColor: Colors.black,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                ingredientsText,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Poly',
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],
@@ -825,7 +838,7 @@ class _MyHomePageState extends State<MyHomePage>
                               icon: const Icon(Icons.input),
                               onPressed: () {
                                 setState(() {
-                                  this.barcode = '8000500037560';
+                                  this.barcode = codebar;
                                   productFuture = getProductInfo(this.barcode);
                                   isWelcomeScreen = false;
                                 });
