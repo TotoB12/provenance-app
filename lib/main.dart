@@ -381,12 +381,12 @@ class ProductPage extends StatelessWidget {
       children: [
         if (isVegetarian)
           _buildLabelIcon(
-            svgAsset: 'assets/icons/vegetarian.svg',
+            svgAsset: 'assets/images/vegetarian.svg',
             text: 'Vegetarian',
           ),
         if (isVegan)
           _buildLabelIcon(
-            svgAsset: 'assets/icons/vegan.svg',
+            svgAsset: 'assets/images/vegan.svg',
             text: 'Vegan',
           ),
       ],
@@ -398,11 +398,13 @@ class ProductPage extends StatelessWidget {
       padding: const EdgeInsets.all(4.0),
       child: Column(
         children: [
-          SvgPicture.asset(svgAsset, width: 24, height: 24),
+          SvgPicture.asset(svgAsset,
+              color: Colors.green, width: 24, height: 24),
           Text(text,
               style: const TextStyle(
                   fontSize: 12,
                   fontFamily: 'Poly',
+                  color: Colors.green,
                   decoration: TextDecoration.none)),
         ],
       ),
@@ -952,8 +954,8 @@ class _MyHomePageState extends State<MyHomePage>
                     child: isError
                         ? Center(
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 17.0, bottom: 17.0),
+                              padding:
+                                  const EdgeInsets.only(top: 4.0, bottom: 17.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
@@ -963,8 +965,6 @@ class _MyHomePageState extends State<MyHomePage>
                                         0.15,
                                     color: Colors.red,
                                   ),
-                                  // const Padding(
-                                  //   padding: EdgeInsets.only(bottom: 17.0),
                                   const Text(
                                     'There has been an error,\nplease try again.',
                                     textAlign: TextAlign.center,
@@ -974,7 +974,6 @@ class _MyHomePageState extends State<MyHomePage>
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  // ),
                                 ],
                               ),
                             ),
