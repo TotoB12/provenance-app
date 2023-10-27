@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:line_icons/line_icons.dart';
 
 const Color mainColor = Color.fromARGB(255, 245, 245, 245);
 const Color accentColor = Color(0xFF262626); // RGB(38, 38, 38)
@@ -258,20 +259,60 @@ class ProductPage extends StatelessWidget {
                     fit: BoxFit.contain,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _buildSubtitleText(
-                    'Origin Countries: ',
-                    product.origins ?? 'Unknown',
+                if (product.brands != null && product.brands!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildSubtitleText(
+                      'Brand${product.brands.toString().split(',').length > 1 ? 's' : ''}: ',
+                      product.brands ?? 'Unknown',
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _buildSubtitleText(
-                    'Manufacturing or processing place: ',
-                    product.manufacturingPlaces ?? 'Unknown',
+                if (product.origins != null && product.origins!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildSubtitleText(
+                      'Origin Countries: ',
+                      product.origins ?? 'Unknown',
+                    ),
                   ),
-                ),
+                if (product.manufacturingPlaces != null &&
+                    product.manufacturingPlaces!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildSubtitleText(
+                      'Manufacturing or processing place: ',
+                      product.manufacturingPlaces ?? 'Unknown',
+                    ),
+                  ),
+                if (product.quantity != null && product.quantity!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildSubtitleText(
+                      'Quantity: ',
+                      product.quantity ?? 'Unknown',
+                    ),
+                  ),
+                if (product.servingSize != null &&
+                    product.servingSize!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildSubtitleText(
+                      'Serving size: ',
+                      product.servingSize ?? 'Unknown',
+                    ),
+                  ),
+                if (product.labelsTags != null &&
+                    product.labelsTags!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.0, bottom: 5.0, top: 5.0),
+                    child: _buildVeganVegetarianLabel(product.labelsTags!),
+                  ),
                 _buildScoreCard(
                   context: context,
                   dataValue: product.nutriscore,
@@ -310,7 +351,7 @@ class ProductPage extends StatelessWidget {
           TextSpan(
             text: leadingText,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontFamily: 'Poly',
               fontWeight: FontWeight.bold,
               color: Colors.black,
@@ -320,13 +361,49 @@ class ProductPage extends StatelessWidget {
           TextSpan(
             text: trailingText,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontFamily: 'Poly',
               fontWeight: FontWeight.w500,
               color: Colors.black,
               decoration: TextDecoration.none,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVeganVegetarianLabel(List<String> labels) {
+    bool isVegetarian = labels.contains('en:vegetarian');
+    bool isVegan = labels.contains('en:vegan');
+
+    return Row(
+      children: [
+        if (isVegetarian)
+          _buildLabelIcon(
+            svgAsset: 'assets/icons/vegetarian.svg',
+            text: 'Vegetarian',
+          ),
+        if (isVegan)
+          _buildLabelIcon(
+            svgAsset: 'assets/icons/vegan.svg',
+            text: 'Vegan',
+          ),
+      ],
+    );
+  }
+
+  Widget _buildLabelIcon({required String svgAsset, required String text}) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Column(
+        children: [
+          SvgPicture.asset(svgAsset, width: 24, height: 24),
+          Text(text,
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Poly',
+                  decoration: TextDecoration.none)),
         ],
       ),
     );
