@@ -236,7 +236,7 @@ class ProductPage extends StatelessWidget {
         slivers: <Widget>[
           CupertinoSliverNavigationBar(
             largeTitle: Text(
-              product.productName ?? 'Default Product Name',
+              product.productName ?? 'Unknown Product',
               style: const TextStyle(
                 color: Colors.black,
                 fontFamily: 'Poly',
@@ -258,14 +258,28 @@ class ProductPage extends StatelessWidget {
                     fit: BoxFit.contain,
                   ),
                 ),
-                _buildInfoCard(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _buildSubtitleText(
+                    'Origin Countries: ',
+                    product.origins ?? 'Unknown',
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _buildSubtitleText(
+                    'Manufacturing or processing place: ',
+                    product.manufacturingPlaces ?? 'Unknown',
+                  ),
+                ),
+                _buildScoreCard(
                   context: context,
                   dataValue: product.nutriscore,
                   assetPrefix: 'nutriscore',
                   description:
                       getNutriScoreMessage(product.nutriscore ?? 'Unknown'),
                 ),
-                _buildInfoCard(
+                _buildScoreCard(
                   context: context,
                   dataValue: product.ecoscoreGrade,
                   assetPrefix: 'ecoscore',
@@ -274,7 +288,7 @@ class ProductPage extends StatelessWidget {
                 ),
                 if (product.ingredientsText?.isNotEmpty ?? false)
                   _buildIngredientsCard(product.ingredientsText!),
-                _buildInfoCard(
+                _buildScoreCard(
                   context: context,
                   dataValue: product.novaGroup.toString(),
                   assetPrefix: 'nova-group',
@@ -289,7 +303,36 @@ class ProductPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard({
+  Widget _buildSubtitleText(String leadingText, String trailingText) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: leadingText,
+            style: const TextStyle(
+              fontSize: 20,
+              fontFamily: 'Poly',
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          TextSpan(
+            text: trailingText,
+            style: const TextStyle(
+              fontSize: 20,
+              fontFamily: 'Poly',
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+              decoration: TextDecoration.none,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreCard({
     required BuildContext context,
     required String? dataValue,
     required String assetPrefix,
@@ -325,6 +368,7 @@ class ProductPage extends StatelessWidget {
                   fontFamily: 'Poly',
                   fontWeight: FontWeight.w500,
                   color: Colors.black,
+                  decoration: TextDecoration.none,
                 ),
               ),
             ),
@@ -349,6 +393,7 @@ class ProductPage extends StatelessWidget {
               fontFamily: 'Poly',
               fontWeight: FontWeight.w500,
               color: Colors.black,
+              decoration: TextDecoration.none,
             ),
           ),
           leading: const Icon(
@@ -367,6 +412,7 @@ class ProductPage extends StatelessWidget {
                   fontFamily: 'Poly',
                   fontWeight: FontWeight.w400,
                   color: Colors.black,
+                  decoration: TextDecoration.none,
                 ),
               ),
             ),
@@ -491,55 +537,6 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   // PageController _pageController = PageController();
-
-  String getEcoScoreMessage(String grade) {
-    switch (grade.toUpperCase()) {
-      case 'A':
-        return 'Very good';
-      case 'B':
-        return 'Good';
-      case 'C':
-        return 'Mediocre';
-      case 'D':
-        return 'Bad';
-      case 'E':
-        return 'Very bad';
-      default:
-        return 'Unknown';
-    }
-  }
-
-  String getNutriScoreMessage(String grade) {
-    switch (grade.toUpperCase()) {
-      case 'A':
-        return 'Very good';
-      case 'B':
-        return 'Good';
-      case 'C':
-        return 'Mediocre';
-      case 'D':
-        return 'Bad';
-      case 'E':
-        return 'Very bad';
-      default:
-        return 'Unknown';
-    }
-  }
-
-  String getNovaGroupMessage(String group) {
-    switch (group) {
-      case '1':
-        return 'Unprocessed or minimally processed food';
-      case '2':
-        return 'Processed culinary ingredients';
-      case '3':
-        return 'Processed foods';
-      case '4':
-        return 'Ultra-processed product';
-      default:
-        return 'Unknown';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
