@@ -9,7 +9,6 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:line_icons/line_icons.dart';
 
 const Color mainColor = Color.fromARGB(255, 245, 245, 245);
 const Color accentColor = Color(0xFF262626); // RGB(38, 38, 38)
@@ -75,6 +74,15 @@ String getNovaGroupMessage(String group) {
     default:
       return 'Food processing level unkown';
   }
+}
+
+String cleanIngredientsText(String text) {
+  if (text.endsWith(',')) {
+    return text.substring(0, text.length - 1).trim();
+  } else if (text.endsWith('.')) {
+    return text.substring(0, text.length - 1).trim();
+  }
+  return text;
 }
 
 class ProductCard extends StatelessWidget {
@@ -242,6 +250,8 @@ class ProductPage extends StatelessWidget {
                 color: Colors.black,
                 fontFamily: 'Poly',
               ),
+              // maxLines: 2,
+              // overflow: TextOverflow.ellipsis,
             ),
             automaticallyImplyLeading: true,
           ),
@@ -273,10 +283,11 @@ class ProductPage extends StatelessWidget {
                     padding: const EdgeInsets.only(
                         right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
                     child: _buildSubtitleText(
-                      'Origin Countries: ',
-                      product.origins ?? 'Unknown',
+                      'Origin of ingredients: ',
+                      product.origins!.replaceAll(RegExp(r',(?!\s)'), ', '),
                     ),
                   ),
+
                 if (product.manufacturingPlaces != null &&
                     product.manufacturingPlaces!.isNotEmpty)
                   Padding(
@@ -306,13 +317,17 @@ class ProductPage extends StatelessWidget {
                       product.servingSize ?? 'Unknown',
                     ),
                   ),
-                if (product.labelsTags != null &&
-                    product.labelsTags!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        right: 20.0, left: 20.0, bottom: 5.0, top: 5.0),
-                    child: _buildVeganVegetarianLabel(product.labelsTags!),
-                  ),
+                // if (product.nutriments != null)
+                //   Padding(
+                //     padding: const EdgeInsets.only(
+                //         right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                //     child: _buildSubtitleText(
+                //       'Nutrition facts: ',
+                //       product.nutriments!.toJson().toString() ?? 'Unknown',
+                //     ),
+                //   ),
+                if (product.ingredientsAnalysisTags != null)
+                  _buildLabelsSubtitle(product.ingredientsAnalysisTags!),
                 _buildScoreCard(
                   context: context,
                   dataValue: product.nutriscore,
@@ -328,7 +343,38 @@ class ProductPage extends StatelessWidget {
                       getEcoScoreMessage(product.ecoscoreGrade ?? 'Unknown'),
                 ),
                 if (product.ingredientsText?.isNotEmpty ?? false)
-                  _buildIngredientsCard(product.ingredientsText!),
+                  _buildIngredientsCard(
+                      context, product.ingredientsText!, product.ingredients),
+                if (product.allergens != null &&
+                    product.allergens!.names.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildBigSubtitleText(
+                      'Allergens: ',
+                      product.allergens!.names,
+                    ),
+                  ),
+                if (product.tracesTags != null &&
+                    product.tracesTags!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildBigSubtitleText(
+                      'Traces: ',
+                      product.tracesTags!,
+                    ),
+                  ),
+                // if (product.tracesTags != null &&
+                //     product.tracesTags!.isNotEmpty)
+                //   Padding(
+                //     padding: const EdgeInsets.only(
+                //         right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                //     child: _buildSubtitleText(
+                //       'Traces: ',
+                //       product.tracesTags!.length.toString() ?? 'Unknown',
+                //     ),
+                //   ),
                 _buildScoreCard(
                   context: context,
                   dataValue: product.novaGroup.toString(),
@@ -336,6 +382,24 @@ class ProductPage extends StatelessWidget {
                   description: getNovaGroupMessage(
                       product.novaGroup.toString() ?? 'Unknown'),
                 ),
+                if (product.nutriments != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
+                    child: _createNutritionalDataTable(
+                        product.nutriments, context),
+                  ),
+                const SizedBox(height: 12),
+                if (product.barcode != null && product.barcode!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildSubtitleText(
+                      'Barcode: ',
+                      product.barcode ?? 'Unknown',
+                    ),
+                  ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -344,7 +408,8 @@ class ProductPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSubtitleText(String leadingText, String trailingText) {
+  Widget _buildSubtitleText(String leadingText, String trailingText,
+      [Color textColor = Colors.black]) {
     return Text.rich(
       TextSpan(
         children: [
@@ -360,11 +425,11 @@ class ProductPage extends StatelessWidget {
           ),
           TextSpan(
             text: trailingText,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontFamily: 'Poly',
               fontWeight: FontWeight.w500,
-              color: Colors.black,
+              color: textColor, // Use the passed or default color
               decoration: TextDecoration.none,
             ),
           ),
@@ -373,40 +438,123 @@ class ProductPage extends StatelessWidget {
     );
   }
 
-  Widget _buildVeganVegetarianLabel(List<String> labels) {
-    bool isVegetarian = labels.contains('en:vegetarian');
-    bool isVegan = labels.contains('en:vegan');
+  // Widget _buildVeganVegetarianLabel(BuildContext context, List<String> labels) {
+  //   bool isVegetarian = labels.contains('en:vegetarian');
+  //   bool isVegan = labels.contains('en:vegan');
+  //
+  //   return Column(
+  //     children: [
+  //       if (isVegetarian)
+  //         _buildLabelCard(
+  //           context: context,
+  //           svgAsset: 'assets/images/vegetarian.svg',
+  //           label: 'Vegetarian',
+  //         ),
+  //       if (isVegan)
+  //         _buildLabelCard(
+  //           context: context,
+  //           svgAsset: 'assets/images/vegan.svg',
+  //           label: 'Vegan',
+  //         ),
+  //     ],
+  //   );
+  // }
 
-    return Row(
-      children: [
-        if (isVegetarian)
-          _buildLabelIcon(
-            svgAsset: 'assets/images/vegetarian.svg',
-            text: 'Vegetarian',
-          ),
-        if (isVegan)
-          _buildLabelIcon(
-            svgAsset: 'assets/images/vegan.svg',
-            text: 'Vegan',
-          ),
-      ],
-    );
+  // Widget _buildLabelCard(
+  //     {required BuildContext context,
+  //     required String svgAsset,
+  //     required String label}) {
+  //   return Card(
+  //     // margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+  //     color: mainColor,
+  //     elevation: 0.0,
+  //     child: Row(
+  //       children: [
+  //         Container(
+  //           width: MediaQuery.of(context).size.width * 0.3,
+  //           height: 67,
+  //           padding: const EdgeInsets.all(4.0),
+  //           child: SvgPicture.asset(svgAsset,
+  //               color: Colors.green, fit: BoxFit.contain),
+  //         ),
+  //         const SizedBox(width: 16.0),
+  //         Expanded(
+  //           child: Text(
+  //             label,
+  //             style: const TextStyle(
+  //               fontSize: 20,
+  //               fontFamily: 'Poly',
+  //               fontWeight: FontWeight.w500,
+  //               color: Colors.green,
+  //               decoration: TextDecoration.none,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  String _getProductLabels(IngredientsAnalysisTags tags) {
+    List<String> labels = [];
+
+    switch (tags.vegetarianStatus) {
+      case VegetarianStatus.VEGETARIAN:
+        labels.add("Vegetarian");
+        break;
+      case VegetarianStatus.NON_VEGETARIAN:
+        labels.add("Non-Vegetarian");
+        break;
+      default:
+        break;
+    }
+
+    switch (tags.veganStatus) {
+      case VeganStatus.VEGAN:
+        labels.add("Vegan");
+        break;
+      case VeganStatus.NON_VEGAN:
+        labels.add("Non-Vegan");
+        break;
+      default:
+        break;
+    }
+
+    switch (tags.palmOilFreeStatus) {
+      case PalmOilFreeStatus.PALM_OIL_FREE:
+        labels.add("Palm Oil Free");
+        break;
+      case PalmOilFreeStatus.PALM_OIL:
+        labels.add("Contains Palm Oil");
+        break;
+      default:
+        break;
+    }
+
+    return labels.join(", ");
   }
 
-  Widget _buildLabelIcon({required String svgAsset, required String text}) {
+  Widget _buildLabelsSubtitle(IngredientsAnalysisTags tags) {
+    String labels = _getProductLabels(tags);
+    Color textColor = Colors.black;
+
+    if (labels.contains("Non-Vegetarian") ||
+        labels.contains("Non-Vegan") ||
+        labels.contains("Contains Palm Oil")) {
+      textColor = Colors.red;
+    } else if (labels.contains("Vegetarian") ||
+        labels.contains("Vegan") ||
+        labels.contains("Palm Oil Free")) {
+      textColor = Colors.green;
+    }
+
     return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Column(
-        children: [
-          SvgPicture.asset(svgAsset,
-              color: Colors.green, width: 24, height: 24),
-          Text(text,
-              style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Poly',
-                  color: Colors.green,
-                  decoration: TextDecoration.none)),
-        ],
+      padding: const EdgeInsets.only(
+          right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+      child: _buildSubtitleText(
+        'Labels: ',
+        labels,
+        textColor,
       ),
     );
   }
@@ -426,8 +574,8 @@ class ProductPage extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: MediaQuery.of(context).size.width * 0.3, // 30% width
-              height: 67, // consistent height for the score images
+              width: MediaQuery.of(context).size.width * 0.3,
+              height: 67,
               padding: const EdgeInsets.all(8.0),
               child: SvgPicture.asset(
                 dataValue != null &&
@@ -457,16 +605,20 @@ class ProductPage extends StatelessWidget {
     );
   }
 
-  Widget _buildIngredientsCard(String ingredientsText) {
+  Widget _buildIngredientsCard(BuildContext context, String ingredientsText,
+      List<Ingredient>? ingredients) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
       color: mainColor,
       elevation: 0.0,
       child: Theme(
-        data: ThemeData(dividerColor: Colors.transparent),
+        data: ThemeData(
+          dividerColor: Colors.transparent,
+          colorScheme: ThemeData().colorScheme.copyWith(primary: Colors.black),
+        ),
         child: ExpansionTile(
           title: Text(
-            '${ingredientsText.split(', ').length} ingredient${ingredientsText.split(', ').length > 1 ? 's' : ''}',
+            '${ingredients?.length ?? 0} ingredient${ingredients != null && ingredients.length > 1 ? 's' : ''}',
             style: const TextStyle(
               fontSize: 20,
               fontFamily: 'Poly',
@@ -475,9 +627,15 @@ class ProductPage extends StatelessWidget {
               decoration: TextDecoration.none,
             ),
           ),
-          leading: const Icon(
-            Icons.list,
-            color: Colors.black,
+          leading: Container(
+            width: MediaQuery.of(context).size.width * 0.3,
+            alignment: Alignment.center, // Align icon to the center
+            child: const Icon(
+              // Icons.list,
+              Icons.local_dining,
+              color: Colors.black,
+              size: 40,
+            ),
           ),
           collapsedTextColor: Colors.black,
           textColor: Colors.black,
@@ -485,7 +643,7 @@ class ProductPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                ingredientsText,
+                cleanIngredientsText(ingredientsText),
                 style: const TextStyle(
                   fontSize: 16,
                   fontFamily: 'Poly',
@@ -499,6 +657,169 @@ class ProductPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String formatList(List<String> list) {
+    return list.map((item) => capitalizeFirstLetter(item)).join(', ');
+  }
+
+  Widget _buildBigSubtitleText(String leadingText, List<String> trailingList,
+      [Color textColor = Colors.black]) {
+    String trailingText = formatList(trailingList);
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: leadingText,
+            style: const TextStyle(
+              fontSize: 20,
+              fontFamily: 'Poly',
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          TextSpan(
+            text: trailingText,
+            style: TextStyle(
+              fontSize: 20,
+              fontFamily: 'Poly',
+              fontWeight: FontWeight.w500,
+              color: textColor,
+              decoration: TextDecoration.none,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
+  String formatNutrientValue(double value) {
+    if (value >= 1.0 || value == 0.0) {
+      return value
+          .toStringAsFixed(2)
+          .replaceAll(RegExp(r"([.]*0+)(?!.*\d)"), "");
+    } else if (value < 1.0 && value > 0.01) {
+      return value.toStringAsFixed(2);
+    } else {
+      return (value * 1000)
+          .toStringAsFixed(2)
+          .replaceAll(RegExp(r"([.]*0+)(?!.*\d)"), "");
+    }
+  }
+
+  Widget _createNutritionalDataTable(
+      Nutriments? nutriments, BuildContext context) {
+    if (nutriments == null) {
+      return const SizedBox.shrink();
+    }
+
+    Map<String, dynamic> nutrientsMap = nutriments.toJson();
+
+    List<String> nutrientNames =
+        nutrientsMap.keys.where((key) => key.endsWith('_100g')).toList();
+
+    if (nutrientNames.contains('energy-kcal_100g') ||
+        nutrientNames.contains('energy-kj_100g')) {
+      nutrientNames.remove('energy-kcal_100g');
+      nutrientNames.remove('energy-kj_100g');
+      nutrientNames.add('energy_100g');
+    }
+
+    nutrientNames = nutrientNames
+        .map((name) => capitalizeFirstLetter(name.replaceAll('_100g', '')))
+        .toList();
+
+    List<DataRow> rows = nutrientNames.map((baseName) {
+      if (baseName == "Energy") {
+        double? servingKj = nutrientsMap['energy-kj_serving'];
+        double? servingKcal = nutrientsMap['energy-kcal_serving'];
+        double? per100gKj = nutrientsMap['energy-kj_100g'];
+        double? per100gKcal = nutrientsMap['energy-kcal_100g'];
+
+        String servingValue = servingKj != null
+            ? "${formatNutrientValue(servingKj)} kj"
+            : servingKcal != null
+                ? "${formatNutrientValue(servingKcal)} kcal"
+                : "0";
+        if (servingKj != null && servingKcal != null) {
+          servingValue =
+              "${formatNutrientValue(servingKj)} kj (${formatNutrientValue(servingKcal)} kcal)";
+        }
+
+        String per100gValue = per100gKj != null
+            ? "${formatNutrientValue(per100gKj)} kj"
+            : per100gKcal != null
+                ? "${formatNutrientValue(per100gKcal)} kcal"
+                : "0";
+        if (per100gKj != null && per100gKcal != null) {
+          per100gValue =
+              "${formatNutrientValue(per100gKj)} kj (${formatNutrientValue(per100gKcal)} kcal)";
+        }
+
+        return DataRow(cells: [
+          DataCell(_styledText(baseName)),
+          DataCell(_styledText(servingValue)),
+          DataCell(_styledText(per100gValue)),
+        ]);
+      } else {
+        return DataRow(cells: [
+          DataCell(_styledText(baseName)),
+          DataCell(_styledText(
+              "${formatNutrientValue(nutrientsMap['${baseName.toLowerCase()}_serving'] ?? 0.0)} g")),
+          DataCell(_styledText(
+              "${formatNutrientValue(nutrientsMap['${baseName.toLowerCase()}_100g'] ?? 0.0)} g")),
+        ]);
+      }
+    }).toList();
+
+    double tableWidth = MediaQuery.of(context).size.width - 32.0;
+
+    return SizedBox(
+      width: tableWidth,
+      child: DataTable(
+        columnSpacing: 16.0,
+        columns: [
+          DataColumn(
+              label: _styledText('Nutrient',
+                  fontWeight: FontWeight.bold, fontSize: 14.0)),
+          DataColumn(
+              label: _styledText('Per Serving',
+                  fontWeight: FontWeight.bold, fontSize: 14.0),
+              numeric: true),
+          DataColumn(
+              label: _styledText('Per 100g',
+                  fontWeight: FontWeight.bold, fontSize: 14.0),
+              numeric: true),
+        ],
+        rows: rows,
+      ),
+    );
+  }
+
+  Widget _styledText(String text,
+      {FontWeight fontWeight = FontWeight.w500, double fontSize = 15.0}) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: fontSize,
+        fontFamily: 'Poly',
+        fontWeight: fontWeight,
+        color: Colors.black,
+        decoration: TextDecoration.none,
+      ),
+      overflow: TextOverflow.visible,
+      maxLines: null,
+    );
+  }
+
+  Widget _constrainedText(String text) {
+    return _styledText(text);
   }
 }
 
@@ -878,11 +1199,11 @@ class _MyHomePageState extends State<MyHomePage>
                           top: 10.0,
                           left: 10.0,
                           child: Container(
-                            decoration: const BoxDecoration(
-                              color: mainColor,
+                            decoration: BoxDecoration(
+                              color: mainColor.withOpacity(0.7),
                               shape: BoxShape.rectangle,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(7.0)),
+                                  const BorderRadius.all(Radius.circular(7.0)),
                             ),
                             child: IconButton(
                               icon: const Icon(Icons.flip_camera_ios),
@@ -902,11 +1223,11 @@ class _MyHomePageState extends State<MyHomePage>
                           left: MediaQuery.of(context).size.width / 2 -
                               20, // Center the button
                           child: Container(
-                            decoration: const BoxDecoration(
-                              color: mainColor,
+                            decoration: BoxDecoration(
+                              color: mainColor.withOpacity(0.7),
                               shape: BoxShape.rectangle,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(7.0)),
+                                  const BorderRadius.all(Radius.circular(7.0)),
                             ),
                             child: IconButton(
                               icon: const Icon(Icons.input),
@@ -928,11 +1249,12 @@ class _MyHomePageState extends State<MyHomePage>
                               ? Container()
                               : Container(
                                   decoration: BoxDecoration(
-                                    color:
-                                        isFlashOn ? Colors.yellow : mainColor,
+                                    color: isFlashOn
+                                        ? Colors.yellow.withOpacity(0.7)
+                                        : mainColor.withOpacity(0.7),
                                     shape: BoxShape.rectangle,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(7.0)),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(7.0)),
                                   ),
                                   child: IconButton(
                                     icon: const Icon(Icons.flash_on),
@@ -1162,6 +1484,8 @@ class _MyHomePageState extends State<MyHomePage>
                           List<Product> products = snapshot.data!
                               .map((e) => Product.fromJson(jsonDecode(e)))
                               .toList();
+                          products = products.reversed.toList();
+
                           return CupertinoScrollbar(
                             child: ListView.builder(
                               itemCount: products.length,
