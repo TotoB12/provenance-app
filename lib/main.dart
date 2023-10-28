@@ -12,8 +12,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 const Color mainColor = Color.fromARGB(255, 245, 245, 245);
 const Color accentColor = Color(0xFF262626); // RGB(38, 38, 38)
-// const String codebar = '8000500037560'; //Kinder Bueno
-const String codebar = '8002270014901'; //S. Pellegrino
+const String codebar = '8000500037560'; //Kinder Bueno
+// const String codebar = '8002270014901'; //S. Pellegrino
 
 void main() {
   OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'Provenance');
@@ -104,13 +104,13 @@ class ProductCard extends StatelessWidget {
       },
       child: Column(
         children: <Widget>[
-          Center(
-            child: Container(
-              height: 0.4,
-              width: MediaQuery.of(context).size.width * 0.9,
-              color: Colors.black,
-            ),
-          ),
+          // Center(
+          //   child: Container(
+          //     height: 0.4,
+          //     width: MediaQuery.of(context).size.width * 0.9,
+          //     color: Colors.black,
+          //   ),
+          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Card(
@@ -125,7 +125,7 @@ class ProductCard extends StatelessWidget {
                       child: Container(
                         width: MediaQuery.of(context).size.width * 0.2,
                         height: MediaQuery.of(context).size.width * 0.2,
-                        child: Image.network(product.imageFrontUrl!,
+                        child: Image.network(product.imageFrontSmallUrl!,
                             fit: BoxFit.contain),
                       ),
                     )
@@ -259,16 +259,18 @@ class ProductPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  constraints: const BoxConstraints(
-                    maxHeight: 200.0,
+                if (product.imageFrontUrl != null)
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    constraints: const BoxConstraints(
+                      maxHeight: 200.0,
+                    ),
+                    child: Image.network(
+                      product.imageFrontUrl!,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  child: Image.network(
-                    product.imageFrontUrl!,
-                    fit: BoxFit.contain,
-                  ),
-                ),
+                if (product.imageFrontUrl == null) const SizedBox(height: 10),
                 if (product.brands != null && product.brands!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(
@@ -580,7 +582,8 @@ class ProductPage extends StatelessWidget {
               child: SvgPicture.asset(
                 dataValue != null &&
                         dataValue != 'not-applicable' &&
-                        dataValue != 'unknown'
+                        dataValue != 'unknown' &&
+                        dataValue != 'null'
                     ? 'assets/images/$assetPrefix-$dataValue.svg'
                     : 'assets/images/$assetPrefix-unknown.svg',
                 fit: BoxFit.contain,
@@ -1151,7 +1154,20 @@ class _MyHomePageState extends State<MyHomePage>
                               itemBuilder: (context, index) {
                                 Product product =
                                     snapshot.data!.products![index];
-                                return ProductCard(product: product);
+                                return Column(
+                                  children: <Widget>[
+                                    Center(
+                                      child: Container(
+                                        height: 0.4,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.9,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    ProductCard(product: product),
+                                  ],
+                                );
                               },
                             ),
                           ),
@@ -1448,6 +1464,13 @@ class _MyHomePageState extends State<MyHomePage>
                     ],
                   ),
                 ),
+                Center(
+                  child: Container(
+                    height: 0.4,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    color: Colors.black,
+                  ),
+                ),
                 Expanded(
                   child: FutureBuilder<List<String>>(
                     future: SharedPreferences.getInstance()
@@ -1490,7 +1513,20 @@ class _MyHomePageState extends State<MyHomePage>
                             child: ListView.builder(
                               itemCount: products.length,
                               itemBuilder: (context, index) {
-                                return ProductCard(product: products[index]);
+                                return Column(
+                                  children: <Widget>[
+                                    Center(
+                                      child: Container(
+                                        height: 0.4,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.9,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    ProductCard(product: products[index]),
+                                  ],
+                                );
                               },
                             ),
                           );
