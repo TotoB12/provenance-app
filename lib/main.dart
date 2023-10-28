@@ -1234,30 +1234,30 @@ class _MyHomePageState extends State<MyHomePage>
                             ),
                           ),
                         ),
-                        Positioned(
-                          top: 10.0,
-                          left: MediaQuery.of(context).size.width / 2 -
-                              20, // Center the button
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: mainColor.withOpacity(0.7),
-                              shape: BoxShape.rectangle,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(7.0)),
-                            ),
-                            child: IconButton(
-                              icon: const Icon(Icons.input),
-                              onPressed: () {
-                                setState(() {
-                                  this.barcode = codebar;
-                                  productFuture = getProductInfo(this.barcode);
-                                  isWelcomeScreen = false;
-                                });
-                                HapticFeedback.heavyImpact();
-                              },
-                            ),
-                          ),
-                        ),
+                        // Positioned(
+                        //   top: 10.0,
+                        //   left: MediaQuery.of(context).size.width / 2 -
+                        //       20, // Center the button
+                        //   child: Container(
+                        //     decoration: BoxDecoration(
+                        //       color: mainColor.withOpacity(0.7),
+                        //       shape: BoxShape.rectangle,
+                        //       borderRadius:
+                        //           const BorderRadius.all(Radius.circular(7.0)),
+                        //     ),
+                        //     child: IconButton(
+                        //       icon: const Icon(Icons.input),
+                        //       onPressed: () {
+                        //         setState(() {
+                        //           this.barcode = codebar;
+                        //           productFuture = getProductInfo(this.barcode);
+                        //           isWelcomeScreen = false;
+                        //         });
+                        //         HapticFeedback.heavyImpact();
+                        //       },
+                        //     ),
+                        //   ),
+                        // ),
                         Positioned(
                           top: 10.0,
                           right: 10.0,
