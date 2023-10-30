@@ -1200,7 +1200,7 @@ class _MyHomePageState extends State<MyHomePage>
                                 if (barcode.rawValue != this.barcode) {
                                   setState(() {
                                     this.barcode = barcode.rawValue ?? '';
-                                    isError = false; // Reset the error flag
+                                    isError = false;
                                     productFuture =
                                         getProductInfo(this.barcode);
                                     isWelcomeScreen = false;
@@ -1322,7 +1322,7 @@ class _MyHomePageState extends State<MyHomePage>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 20.0),
+                                      padding: const EdgeInsets.only(top: 10.0),
                                       child: Icon(
                                         Icons.camera_enhance,
                                         size:
