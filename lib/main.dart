@@ -235,6 +235,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class SettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text('Settings'),
+      ),
+      child: Center(
+        child: Text('Settings Page'),
+      ),
+    );
+  }
+}
+
 class ProductPage extends StatelessWidget {
   final Product product;
 
@@ -957,6 +971,17 @@ class _MyHomePageState extends State<MyHomePage>
         ),
         backgroundColor: const Color(0xFF262626),
         toolbarHeight: 47.0,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (context) => SettingsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: IndexedStack(
         index: _selectedIndex,
