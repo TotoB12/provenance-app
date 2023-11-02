@@ -24,7 +24,7 @@ void main() {
 
   OpenFoodAPIConfiguration.globalCountry = OpenFoodFactsCountry.USA;
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 String getEcoScoreMessage(String grade) {
