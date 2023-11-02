@@ -235,7 +235,7 @@ class MyApp extends StatelessWidget {
 class ProductPage extends StatelessWidget {
   final Product product;
 
-  ProductPage({required this.product});
+  const ProductPage({required this.product});
 
   @override
   Widget build(BuildContext context) {
