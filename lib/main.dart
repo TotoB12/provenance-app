@@ -88,7 +88,7 @@ String cleanIngredientsText(String text) {
 class ProductCard extends StatelessWidget {
   final Product product;
 
-  ProductCard({required this.product});
+  const ProductCard({Key? key, required this.product}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +122,7 @@ class ProductCard extends StatelessWidget {
                   if (product.imageFrontSmallUrl != null)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Container(
+                      child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.2,
                         height: MediaQuery.of(context).size.width * 0.2,
                         child: Image.network(product.imageFrontSmallUrl!,
@@ -132,7 +132,7 @@ class ProductCard extends StatelessWidget {
                   else
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Container(
+                      child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.2,
                         height: MediaQuery.of(context).size.width * 0.2,
                         child: const Icon(Icons.shopping_cart, size: 50),
@@ -190,7 +190,8 @@ class ProductCard extends StatelessWidget {
                               // ),
                               const SizedBox(width: 10),
                               if (product.novaGroup != null &&
-                                  product.novaGroup != 'not-applicable')
+                                  product.novaGroup.toString() !=
+                                      'not-applicable')
                                 // Expanded(
                                 SvgPicture.asset(
                                     'assets/images/nova-group-${product.novaGroup}.svg',
@@ -219,6 +220,8 @@ class ProductCard extends StatelessWidget {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -235,7 +238,7 @@ class MyApp extends StatelessWidget {
 class ProductPage extends StatelessWidget {
   final Product product;
 
-  const ProductPage({required this.product});
+  const ProductPage({Key? key, required this.product}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -381,8 +384,8 @@ class ProductPage extends StatelessWidget {
                   context: context,
                   dataValue: product.novaGroup.toString(),
                   assetPrefix: 'nova-group',
-                  description: getNovaGroupMessage(
-                      product.novaGroup.toString() ?? 'Unknown'),
+                  description:
+                      getNovaGroupMessage(product.novaGroup.toString()),
                 ),
                 if (product.nutriments != null)
                   Padding(
@@ -821,9 +824,9 @@ class ProductPage extends StatelessWidget {
     );
   }
 
-  Widget _constrainedText(String text) {
-    return _styledText(text);
-  }
+  // Widget _constrainedText(String text) {
+  //   return _styledText(text);
+  // }
 }
 
 class MyHomePage extends StatefulWidget {
@@ -832,7 +835,7 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage>
@@ -1190,7 +1193,7 @@ class _MyHomePageState extends State<MyHomePage>
                   Flexible(
                     child: Stack(
                       children: <Widget>[
-                        Container(
+                        SizedBox(
                           height: MediaQuery.of(context).size.height * 0.62,
                           child: MobileScanner(
                             controller: cameraController,
@@ -1353,7 +1356,7 @@ class _MyHomePageState extends State<MyHomePage>
                                     AsyncSnapshot<Product> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                    return Container(
+                                    return SizedBox(
                                       height:
                                           MediaQuery.of(context).size.height *
                                               0.2,
