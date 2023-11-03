@@ -238,7 +238,7 @@ class MyApp extends StatelessWidget {
 class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
+    return const CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text('Settings'),
       ),
@@ -401,6 +401,15 @@ class ProductPage extends StatelessWidget {
                   description:
                       getNovaGroupMessage(product.novaGroup.toString()),
                 ),
+                if (product.nutriments != null)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20.0, left: 20.00, bottom: 5.0, top: 5.0),
+                    child: _buildSubtitleText(
+                      'Tables: ',
+                      product.nutriments!.toJson().toString() ?? 'Unknown',
+                    ),
+                  ),
                 if (product.nutriments != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -741,61 +750,33 @@ class ProductPage extends StatelessWidget {
 
     Map<String, dynamic> nutrientsMap = nutriments.toJson();
 
+    // Add this condition to check if nutrientsMap is not empty
+    if (nutrientsMap.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     List<String> nutrientNames =
         nutrientsMap.keys.where((key) => key.endsWith('_100g')).toList();
 
-    if (nutrientNames.contains('energy-kcal_100g') ||
-        nutrientNames.contains('energy-kj_100g')) {
-      nutrientNames.remove('energy-kcal_100g');
-      nutrientNames.remove('energy-kj_100g');
-      nutrientNames.add('energy_100g');
-    }
+    // if (nutrientNames.contains('energy-kcal_100g') ||
+    //     nutrientNames.contains('energy-kj_100g')) {
+    //   nutrientNames.remove('energy-kcal_100g');
+    //   nutrientNames.remove('energy-kj_100g');
+    //   nutrientNames.add('energy_100g');
+    // }
 
     nutrientNames = nutrientNames
         .map((name) => capitalizeFirstLetter(name.replaceAll('_100g', '')))
         .toList();
 
     List<DataRow> rows = nutrientNames.map((baseName) {
-      if (baseName == "Energy") {
-        double? servingKj = nutrientsMap['energy-kj_serving'];
-        double? servingKcal = nutrientsMap['energy-kcal_serving'];
-        double? per100gKj = nutrientsMap['energy-kj_100g'];
-        double? per100gKcal = nutrientsMap['energy-kcal_100g'];
-
-        String servingValue = servingKj != null
-            ? "${formatNutrientValue(servingKj)} kj"
-            : servingKcal != null
-                ? "${formatNutrientValue(servingKcal)} kcal"
-                : "0";
-        if (servingKj != null && servingKcal != null) {
-          servingValue =
-              "${formatNutrientValue(servingKj)} kj (${formatNutrientValue(servingKcal)} kcal)";
-        }
-
-        String per100gValue = per100gKj != null
-            ? "${formatNutrientValue(per100gKj)} kj"
-            : per100gKcal != null
-                ? "${formatNutrientValue(per100gKcal)} kcal"
-                : "0";
-        if (per100gKj != null && per100gKcal != null) {
-          per100gValue =
-              "${formatNutrientValue(per100gKj)} kj (${formatNutrientValue(per100gKcal)} kcal)";
-        }
-
-        return DataRow(cells: [
-          DataCell(_styledText(baseName)),
-          DataCell(_styledText(servingValue)),
-          DataCell(_styledText(per100gValue)),
-        ]);
-      } else {
-        return DataRow(cells: [
-          DataCell(_styledText(baseName)),
-          DataCell(_styledText(
-              "${formatNutrientValue(nutrientsMap['${baseName.toLowerCase()}_serving'] ?? 0.0)} g")),
-          DataCell(_styledText(
-              "${formatNutrientValue(nutrientsMap['${baseName.toLowerCase()}_100g'] ?? 0.0)} g")),
-        ]);
-      }
+      return DataRow(cells: [
+        DataCell(_styledText(baseName)),
+        DataCell(_styledText(
+            "${nutrientsMap['${baseName.toLowerCase()}_serving'] ?? 0.0}")),
+        DataCell(_styledText(
+            "${nutrientsMap['${baseName.toLowerCase()}_100g'] ?? 0.0}")),
+      ]);
     }).toList();
 
     double tableWidth = MediaQuery.of(context).size.width - 32.0;
