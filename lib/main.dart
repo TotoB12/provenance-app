@@ -260,7 +260,7 @@ class AppInfoPage extends StatelessWidget {
       backgroundColor: mainColor,
       navigationBar: const CupertinoNavigationBar(
         middle: Text(
-          'About Provenance',
+          'Provenance',
           style: TextStyle(
             color: Colors.black,
             fontFamily: 'Poly',
