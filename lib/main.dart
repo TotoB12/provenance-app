@@ -164,13 +164,13 @@ class ProductCard extends StatelessWidget {
                                   product.nutriscore != 'not-applicable')
                                 // Expanded(
                                 SvgPicture.asset(
-                                    'assets/images/nutriscore-${product.nutriscore}.svg',
+                                    'assets/scores/nutriscore-${product.nutriscore}.svg',
                                     height: 50)
                               // )
                               else
                                 // Expanded(
                                 SvgPicture.asset(
-                                    'assets/images/nutriscore-unknown.svg',
+                                    'assets/scores/nutriscore-unknown.svg',
                                     height: 50),
                               // ),
                               const SizedBox(width: 10),
@@ -179,13 +179,13 @@ class ProductCard extends StatelessWidget {
                                   product.ecoscoreGrade != 'unknown')
                                 // Expanded(
                                 SvgPicture.asset(
-                                    'assets/images/ecoscore-${product.ecoscoreGrade}.svg',
+                                    'assets/scores/ecoscore-${product.ecoscoreGrade}.svg',
                                     height: 50)
                               // )
                               else
                                 // Expanded(
                                 SvgPicture.asset(
-                                    'assets/images/ecoscore-unknown.svg',
+                                    'assets/scores/ecoscore-unknown.svg',
                                     height: 50),
                               // ),
                               const SizedBox(width: 10),
@@ -194,13 +194,13 @@ class ProductCard extends StatelessWidget {
                                       'not-applicable')
                                 // Expanded(
                                 SvgPicture.asset(
-                                    'assets/images/nova-group-${product.novaGroup}.svg',
+                                    'assets/scores/nova-group-${product.novaGroup}.svg',
                                     height: 50)
                               // )
                               else
                                 // Expanded(
                                 SvgPicture.asset(
-                                    'assets/images/nova-group-unknown.svg',
+                                    'assets/scores/nova-group-unknown.svg',
                                     height: 50)
                               // ),
                             ],
@@ -236,6 +236,8 @@ class MyApp extends StatelessWidget {
 }
 
 class SettingsPage extends StatelessWidget {
+  const SettingsPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return const CupertinoPageScaffold(
@@ -244,6 +246,89 @@ class SettingsPage extends StatelessWidget {
       ),
       child: Center(
         child: Text('Settings Page'),
+      ),
+    );
+  }
+}
+
+class AppInfoPage extends StatelessWidget {
+  const AppInfoPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      backgroundColor: mainColor,
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text(
+          'About Provenance',
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'Poly',
+            decoration: TextDecoration.none,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 20),
+              SvgPicture.asset('assets/icons/logo.svg', width: 120),
+              const SizedBox(height: 30),
+              _buildSectionTitle('About the App'),
+              _buildSectionContent(
+                  'Hi, I’m Antonin Beliard, the creator of Provenance. This app is my approach to promoting informed food choices. '
+                  'It’s designed to give you detailed insights into the nutritional quality, environmental impact, and processing level '
+                  'of various food products. My goal is to empower you with accurate and comprehensive information to help you make healthier '
+                  'and more sustainable eating choices.'),
+              const SizedBox(height: 20),
+              _buildSectionTitle('A Word from the Creator'),
+              _buildSectionContent(
+                  'I am a 16-year-old French-American student at the Rochambeau French International School. Developing Provenance has been an exciting '
+                  'journey for me. I am passionate about sustainable living and healthy eating, and this app is a reflection of that passion. '
+                  'I hope Provenance helps you as much as it has helped me in making informed food choices.'),
+              const SizedBox(height: 20),
+              _buildSectionTitle('Acknowledgements'),
+              Image.asset('assets/icons/openfoodfacts_long.png', width: 200),
+              _buildSectionContent(
+                  'A special thanks to OpenFoodFacts for providing the data used in Provenance through their API. '
+                  'Their extensive database allows Provenance to deliver accurate and comprehensive information about food products. '
+                  'I am grateful for their support and collaboration in this project.'),
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 22,
+        fontFamily: 'Poly',
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.none,
+      ),
+    );
+  }
+
+  Widget _buildSectionContent(String content) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Text(
+        content,
+        textAlign: TextAlign.justify,
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 16,
+          fontFamily: 'Poly',
+          decoration: TextDecoration.none,
+        ),
       ),
     );
   }
@@ -475,13 +560,13 @@ class ProductPage extends StatelessWidget {
   //       if (isVegetarian)
   //         _buildLabelCard(
   //           context: context,
-  //           svgAsset: 'assets/images/vegetarian.svg',
+  //           svgAsset: 'assets/scores/vegetarian.svg',
   //           label: 'Vegetarian',
   //         ),
   //       if (isVegan)
   //         _buildLabelCard(
   //           context: context,
-  //           svgAsset: 'assets/images/vegan.svg',
+  //           svgAsset: 'assets/scores/vegan.svg',
   //           label: 'Vegan',
   //         ),
   //     ],
@@ -610,8 +695,8 @@ class ProductPage extends StatelessWidget {
                         dataValue != 'not-applicable' &&
                         dataValue != 'unknown' &&
                         dataValue != 'null'
-                    ? 'assets/images/$assetPrefix-$dataValue.svg'
-                    : 'assets/images/$assetPrefix-unknown.svg',
+                    ? 'assets/scores/$assetPrefix-$dataValue.svg'
+                    : 'assets/scores/$assetPrefix-unknown.svg',
                 fit: BoxFit.contain,
               ),
             ),
@@ -948,17 +1033,29 @@ class _MyHomePageState extends State<MyHomePage>
           style: const TextStyle(
             fontFamily: 'Poly',
             fontWeight: FontWeight.w700,
+            color: mainColor,
           ),
         ),
-        backgroundColor: const Color(0xFF262626),
+        backgroundColor: accentColor,
         toolbarHeight: 47.0,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
+            color: mainColor,
             onPressed: () {
               Navigator.push(
                 context,
                 CupertinoPageRoute(builder: (context) => SettingsPage()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            color: mainColor,
+            onPressed: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (context) => AppInfoPage()),
               );
             },
           ),
@@ -1243,30 +1340,30 @@ class _MyHomePageState extends State<MyHomePage>
                             ),
                           ),
                         ),
-                        // Positioned(
-                        //   top: 10.0,
-                        //   left: MediaQuery.of(context).size.width / 2 -
-                        //       20, // Center the button
-                        //   child: Container(
-                        //     decoration: BoxDecoration(
-                        //       color: mainColor.withOpacity(0.7),
-                        //       shape: BoxShape.rectangle,
-                        //       borderRadius:
-                        //           const BorderRadius.all(Radius.circular(7.0)),
-                        //     ),
-                        //     child: IconButton(
-                        //       icon: const Icon(Icons.input),
-                        //       onPressed: () {
-                        //         setState(() {
-                        //           this.barcode = codebar;
-                        //           productFuture = getProductInfo(this.barcode);
-                        //           isWelcomeScreen = false;
-                        //         });
-                        //         HapticFeedback.heavyImpact();
-                        //       },
-                        //     ),
-                        //   ),
-                        // ),
+                        Positioned(
+                          top: 10.0,
+                          left: MediaQuery.of(context).size.width / 2 -
+                              20, // Center the button
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: mainColor.withOpacity(0.7),
+                              shape: BoxShape.rectangle,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(7.0)),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.input),
+                              onPressed: () {
+                                setState(() {
+                                  this.barcode = codebar;
+                                  productFuture = getProductInfo(this.barcode);
+                                  isWelcomeScreen = false;
+                                });
+                                HapticFeedback.heavyImpact();
+                              },
+                            ),
+                          ),
+                        ),
                         Positioned(
                           top: 10.0,
                           right: 10.0,
