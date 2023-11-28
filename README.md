@@ -2,6 +2,13 @@
 
 The Provenance mobile app is a tool designed to provide mobile users with information about products using their barcodes. It utilizes barcode scanning to fetch product information from online sources and display it to the user. This repository contains the source code for the mobile app.
 
+## Download
+
+The Provenance mobile app is not yet available on the Google Play or Apple App stores. You can download the pre-release app files below:
+
+iOS download link: [https://github.com/TotoB12/provenance-app/releases/latest/download/Provenance.ipa](https://github.com/TotoB12/provenance-app/releases/download/v0.7/Provenance.ipa)
+Android download link: [https://github.com/TotoB12/provenance-app/releases/latest/download/app-release.apk](https://github.com/TotoB12/provenance-app/releases/download/v0.7/app-release.apk)
+
 ## Features
 
 - Barcode scanning to fetch product information.
